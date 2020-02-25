@@ -17,11 +17,11 @@ class DanbooruApi(url: String) : Api(url) {
     override suspend fun getPostFromJson(json: JSONObject): Post? {
         return try {
             with(json) {
-                val tagsGeneral = json.getString("tag_string_general").split(" ").filter { it != "" }.map { Tag(it, Tag.GENERAL) }
-                val tagsCharacter = json.getString("tag_string_character").split(" ").filter { it != "" }.map { Tag(it, Tag.CHARACTER) }
-                val tagsCopyright = json.getString("tag_string_copyright").split(" ").filter { it != "" }.map { Tag(it, Tag.COPYPRIGHT) }
-                val tagsArtist = json.getString("tag_string_artist").split(" ").filter { it != "" }.map { Tag(it, Tag.ARTIST) }
-                val tagsMeta = json.getString("tag_string_meta").split(" ").filter { it != "" }.map { Tag(it, Tag.META) }
+                val tagsGeneral = json.getString("tag_string_general").split(" ").filter { it != "" }.map { Tag(it, Tag.GENERAL, this@DanbooruApi) }
+                val tagsCharacter = json.getString("tag_string_character").split(" ").filter { it != "" }.map { Tag(it, Tag.CHARACTER, this@DanbooruApi) }
+                val tagsCopyright = json.getString("tag_string_copyright").split(" ").filter { it != "" }.map { Tag(it, Tag.COPYPRIGHT, this@DanbooruApi) }
+                val tagsArtist = json.getString("tag_string_artist").split(" ").filter { it != "" }.map { Tag(it, Tag.ARTIST, this@DanbooruApi) }
+                val tagsMeta = json.getString("tag_string_meta").split(" ").filter { it != "" }.map { Tag(it, Tag.META, this@DanbooruApi) }
                 val tags = ArrayList<Tag>(tagsGeneral.size + tagsCharacter.size + tagsCopyright.size + tagsArtist.size + tagsMeta.size)
                 tags += tagsArtist
                 tags += tagsCopyright
@@ -30,7 +30,7 @@ class DanbooruApi(url: String) : Api(url) {
                 tags += tagsMeta
                 Post(getInt("id"), getString("file_ext"), getInt("image_width"), getInt("image_height"),
                         getString("rating"), getInt("file_size"), getString("file_url"),
-                        getString("large_file_url"), getString("preview_file_url"), tags)
+                        getString("large_file_url"), getString("preview_file_url"), tags, getString("tag_string"), this@DanbooruApi)
             }
         } catch (e: Exception) {
             null
@@ -40,7 +40,7 @@ class DanbooruApi(url: String) : Api(url) {
     override suspend fun getTagFromJson(json: JSONObject): Tag? {
         return try {
             val name = json.getString("name")
-            Tag(name, json.getInt("category"), count = json.getInt("post_count"))
+            Tag(name, json.getInt("category"), this, count = json.getInt("post_count"))
         } catch (e: Exception) {
             null
         }

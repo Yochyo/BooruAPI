@@ -1,6 +1,8 @@
 package de.yochyo.booruapi.objects
 
-data class Tag(val name: String, val type: Int, val count: Int = 0) {
+import de.yochyo.booruapi.api.Api
+
+data class Tag(val name: String, val type: Int, val api: Api, val count: Int = 0) {
 
     companion object {
         const val GENERAL = 0

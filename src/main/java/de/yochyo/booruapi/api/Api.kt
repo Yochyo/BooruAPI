@@ -44,13 +44,13 @@ abstract class Api(url: String) {
     }
 
     open suspend fun getTag(name: String): Tag {
-        if (name == "*") return Tag(name, Tag.SPECIAL, count = newestID())
+        if (name == "*") return Tag(name, Tag.SPECIAL, this, count = newestID())
         val json = DownloadUtils.getJson(urlGetTag(name))
         if (json != null && json.length() > 0) {
             val tag = getTagFromJson(json.getJSONObject(0))
             if (tag != null) return tag
         }
-        return Tag(name, if (Tag.isSpecialTag(name)) Tag.SPECIAL else Tag.UNKNOWN)
+        return Tag(name, if (Tag.isSpecialTag(name)) Tag.SPECIAL else Tag.UNKNOWN, this)
     }
 
     open suspend fun getPosts(page: Int, tags: Array<String>, limit: Int = DEFAULT_POST_LIMIT): List<Post>? {
@@ -66,7 +66,6 @@ abstract class Api(url: String) {
         return if (json != null) {
             for (i in 0 until json.length()) {
                 val post = getPostFromJson(json.getJSONObject(i))
-                println("post $i")
                 if (post != null) posts += post
             }
             posts

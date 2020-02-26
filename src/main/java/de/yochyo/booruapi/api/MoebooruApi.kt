@@ -9,8 +9,8 @@ import org.json.JSONObject
 class MoebooruApi(url: String) : Api(url) {
     private val utils = MoebooruUtils()
     override fun urlGetTag(name: String): String = "${url}tag.json?name=$name*"
-    override fun urlGetTags(beginSequence: String): String {
-        return "${url}tag.json?name=$beginSequence*&limit=$DEFAULT_TAG_LIMIT&search[order]=count"
+    override fun urlGetTags(beginSequence: String, amount: Int): String {
+        return "${url}tag.json?name=$beginSequence*&limit=$amount&search[order]=count"
     }
 
     override fun urlGetPosts(page: Int, tags: Array<String>, limit: Int): String {

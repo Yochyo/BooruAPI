@@ -24,16 +24,16 @@ abstract class Api(url: String) {
         const val DEFAULT_TAG_LIMIT = 10
     }
 
-    abstract fun urlGetTags(beginSequence: String): String
+    abstract fun urlGetTags(beginSequence: String, amount: Int): String
     abstract fun urlGetTag(name: String): String
     abstract fun urlGetPosts(page: Int, tags: Array<String>, limit: Int): String
 
     abstract suspend fun getTagFromJson(json: JSONObject): Tag?
     abstract suspend fun getPostFromJson(json: JSONObject): Post?
 
-    open suspend fun getMatchingTags(beginSequence: String): List<Tag> {
-        val array = ArrayList<Tag>(DEFAULT_TAG_LIMIT)
-        val json = DownloadUtils.getJson(urlGetTags(beginSequence))
+    open suspend fun getMatchingTags(beginSequence: String, amount: Int = DEFAULT_TAG_LIMIT): List<Tag> {
+        val array = ArrayList<Tag>(amount)
+        val json = DownloadUtils.getJson(urlGetTags(beginSequence, amount))
         if (json != null) {
             for (i in 0 until json.length()) {
                 val tag = getTagFromJson(json.getJSONObject(i))

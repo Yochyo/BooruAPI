@@ -6,8 +6,8 @@ import org.json.JSONObject
 
 class DanbooruApi(url: String) : Api(url) {
     override fun urlGetTag(name: String) = "${url}tags.json?search[name_matches]=$name"
-    override fun urlGetTags(beginSequence: String): String {
-        return "${url}tags.json?search[name_matches]=$beginSequence*&limit=$DEFAULT_TAG_LIMIT&search[order]=count"
+    override fun urlGetTags(beginSequence: String, amount: Int): String {
+        return "${url}tags.json?search[name_matches]=$beginSequence*&limit=$amount&search[order]=count"
     }
 
     override fun urlGetPosts(page: Int, tags: Array<String>, limit: Int): String {

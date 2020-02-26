@@ -24,19 +24,19 @@ abstract class Api(url: String) {
         const val DEFAULT_TAG_LIMIT = 10
     }
 
-    abstract fun urlGetTags(beginSequence: String, amount: Int): String
-    abstract fun urlGetTag(name: String): String
-    abstract fun urlGetPosts(page: Int, tags: Array<String>, limit: Int): String
+    abstract fun getMatchingTagsUrl(beginSequence: String, limit: Int): String
+    abstract fun getTagUrl(name: String): String
+    abstract fun getPostsUrl(page: Int, tags: Array<String>, limit: Int): String
 
-    abstract suspend fun getTagFromJson(json: JSONObject): Tag?
-    abstract suspend fun getPostFromJson(json: JSONObject): Post?
+    abstract suspend fun tagFromJson(json: JSONObject): Tag?
+    abstract suspend fun postFromJson(json: JSONObject): Post?
 
     open suspend fun getMatchingTags(beginSequence: String, amount: Int = DEFAULT_TAG_LIMIT): List<Tag> {
         val array = ArrayList<Tag>(amount)
-        val json = DownloadUtils.getJson(urlGetTags(beginSequence, amount))
+        val json = DownloadUtils.getJson(getMatchingTagsUrl(beginSequence, amount))
         if (json != null) {
             for (i in 0 until json.length()) {
-                val tag = getTagFromJson(json.getJSONObject(i))
+                val tag = tagFromJson(json.getJSONObject(i))
                 if (tag != null) array.add(tag)
             }
         }
@@ -45,9 +45,9 @@ abstract class Api(url: String) {
 
     open suspend fun getTag(name: String): Tag {
         if (name == "*") return Tag(name, Tag.SPECIAL, this, count = newestID())
-        val json = DownloadUtils.getJson(urlGetTag(name))
+        val json = DownloadUtils.getJson(getTagUrl(name))
         if (json != null && json.length() > 0) {
-            val tag = getTagFromJson(json.getJSONObject(0))
+            val tag = tagFromJson(json.getJSONObject(0))
             if (tag != null) return tag
         }
         return Tag(name, if (Tag.isSpecialTag(name)) Tag.SPECIAL else Tag.UNKNOWN, this)
@@ -55,7 +55,7 @@ abstract class Api(url: String) {
 
     open suspend fun getPosts(page: Int, tags: Array<String>, limit: Int = DEFAULT_POST_LIMIT): List<Post>? {
         val posts = ArrayList<Post>(limit)
-        val urlBuilder = StringBuilder().append(urlGetPosts(page, tags, limit))
+        val urlBuilder = StringBuilder().append(getPostsUrl(page, tags, limit))
         if (tags.isNotEmpty()) {
             urlBuilder.append("&tags=")
             for (tag in tags)
@@ -65,7 +65,7 @@ abstract class Api(url: String) {
         val json = DownloadUtils.getJson(urlBuilder.toString())
         return if (json != null) {
             for (i in 0 until json.length()) {
-                val post = getPostFromJson(json.getJSONObject(i))
+                val post = postFromJson(json.getJSONObject(i))
                 if (post != null) posts += post
             }
             posts
@@ -73,7 +73,7 @@ abstract class Api(url: String) {
     }
 
     open suspend fun newestID(): Int {
-        val json = DownloadUtils.getJson(urlGetPosts(1, arrayOf("*"), 1))
+        val json = DownloadUtils.getJson(getPostsUrl(1, arrayOf("*"), 1))
         return json?.getJSONObject(0)?.getInt("id") ?: 0
     }
 }

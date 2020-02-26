@@ -8,16 +8,16 @@ import org.json.JSONObject
 
 class MoebooruApi(url: String) : Api(url) {
     private val utils = MoebooruUtils()
-    override fun urlGetTag(name: String): String = "${url}tag.json?name=$name*"
-    override fun urlGetTags(beginSequence: String, amount: Int): String {
-        return "${url}tag.json?name=$beginSequence*&limit=$amount&search[order]=count"
+    override fun getTagUrl(name: String): String = "${url}tag.json?name=$name*"
+    override fun getMatchingTagsUrl(beginSequence: String, limit: Int): String {
+        return "${url}tag.json?name=$beginSequence*&limit=$limit&search[order]=count"
     }
 
-    override fun urlGetPosts(page: Int, tags: Array<String>, limit: Int): String {
+    override fun getPostsUrl(page: Int, tags: Array<String>, limit: Int): String {
         return "${url}post.json?limit=$limit&page=$page&login=$username&password_hash=$passwordHash"
     }
 
-    override suspend fun getPostFromJson(json: JSONObject): Post? {
+    override suspend fun postFromJson(json: JSONObject): Post? {
         return try {
             with(json) {
                 return object : Post(getInt("id"), getString("file_url").substringAfterLast("."), getInt("width"), getInt("height"),
@@ -37,7 +37,7 @@ class MoebooruApi(url: String) : Api(url) {
         }
     }
 
-    override suspend fun getTagFromJson(json: JSONObject): Tag? {
+    override suspend fun tagFromJson(json: JSONObject): Tag? {
         return try {
             val name = json.getString("name")
             Tag(name, json.getInt("type"), this@MoebooruApi, json.getInt("count"))

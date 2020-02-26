@@ -5,16 +5,16 @@ import de.yochyo.booruapi.objects.Tag
 import org.json.JSONObject
 
 class DanbooruApi(url: String) : Api(url) {
-    override fun urlGetTag(name: String) = "${url}tags.json?search[name_matches]=$name"
-    override fun urlGetTags(beginSequence: String, amount: Int): String {
-        return "${url}tags.json?search[name_matches]=$beginSequence*&limit=$amount&search[order]=count"
+    override fun getTagUrl(name: String) = "${url}tags.json?search[name_matches]=$name"
+    override fun getMatchingTagsUrl(beginSequence: String, limit: Int): String {
+        return "${url}tags.json?search[name_matches]=$beginSequence*&limit=$limit&search[order]=count"
     }
 
-    override fun urlGetPosts(page: Int, tags: Array<String>, limit: Int): String {
+    override fun getPostsUrl(page: Int, tags: Array<String>, limit: Int): String {
         return "${url}posts.json?limit=$limit&page=$page&login=$username&password_hash=$passwordHash"
     }
 
-    override suspend fun getPostFromJson(json: JSONObject): Post? {
+    override suspend fun postFromJson(json: JSONObject): Post? {
         return try {
             with(json) {
                 val tagsGeneral = json.getString("tag_string_general").split(" ").filter { it != "" }.map { Tag(it, Tag.GENERAL, this@DanbooruApi) }
@@ -37,7 +37,7 @@ class DanbooruApi(url: String) : Api(url) {
         }
     }
 
-    override suspend fun getTagFromJson(json: JSONObject): Tag? {
+    override suspend fun tagFromJson(json: JSONObject): Tag? {
         return try {
             val name = json.getString("name")
             Tag(name, json.getInt("category"), this, count = json.getInt("post_count"))

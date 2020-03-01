@@ -2,7 +2,7 @@ package de.yochyo.booruapi.objects
 
 import de.yochyo.booruapi.api.Api
 
-data class Tag(val name: String, val type: Int, val api: Api, val count: Int = 0) {
+data class Tag(val name: String, val type: Int, val api: Api, val count: Int = 0): Comparable<Tag> {
 
     companion object {
         const val GENERAL = 0
@@ -25,5 +25,8 @@ data class Tag(val name: String, val type: Int, val api: Api, val count: Int = 0
     }
 
     override fun toString(): String = name
+    override fun compareTo(other: Tag): Int {
+        return name.compareTo(other.name)
+    }
 
 }

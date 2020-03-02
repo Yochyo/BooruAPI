@@ -33,7 +33,7 @@ abstract class Api(url: String) {
 
     open suspend fun getMatchingTags(beginSequence: String, amount: Int = DEFAULT_TAG_LIMIT): List<Tag> {
         val array = ArrayList<Tag>(amount)
-        val json = DownloadUtils.getJson(getMatchingTagsUrl(beginSequence, amount))
+        val json = DownloadUtils.getJson(getMatchingTagsUrl(parseUrlCharacters(beginSequence), amount))
         if (json != null) {
             for (i in 0 until json.length()) {
                 val tag = tagFromJson(json.getJSONObject(i))
@@ -45,7 +45,7 @@ abstract class Api(url: String) {
 
     open suspend fun getTag(name: String): Tag {
         if (name == "*") return Tag(name, Tag.SPECIAL, this, count = newestID())
-        val json = DownloadUtils.getJson(getTagUrl(name))
+        val json = DownloadUtils.getJson(getTagUrl(parseUrlCharacters(name)))
         if (json != null && json.length() > 0) {
             val tag = tagFromJson(json.getJSONObject(0))
             if (tag != null) return tag
@@ -75,5 +75,9 @@ abstract class Api(url: String) {
     open suspend fun newestID(): Int {
         val json = DownloadUtils.getJson(getPostsUrl(1, arrayOf("*"), 1))
         return json?.getJSONObject(0)?.getInt("id") ?: 0
+    }
+
+    protected fun parseUrlCharacters(urlStr: String): String {
+        return URLEncoder.encode(urlStr, "UTF-8")
     }
 }

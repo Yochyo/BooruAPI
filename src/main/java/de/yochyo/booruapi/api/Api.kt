@@ -33,7 +33,7 @@ abstract class Api(url: String) {
 
     open suspend fun getMatchingTags(beginSequence: String, amount: Int = DEFAULT_TAG_LIMIT): List<Tag> {
         val array = ArrayList<Tag>(amount)
-        val json = DownloadUtils.getJson(getMatchingTagsUrl(parseUrlCharacters(beginSequence), amount))
+        val json = DownloadUtils.getJson(getMatchingTagsUrl(parseToUrl(beginSequence), amount))
         if (json != null) {
             for (i in 0 until json.length()) {
                 val tag = tagFromJson(json.getJSONObject(i))
@@ -45,7 +45,7 @@ abstract class Api(url: String) {
 
     open suspend fun getTag(name: String): Tag {
         if (name == "*") return Tag(name, Tag.SPECIAL, this, count = newestID())
-        val json = DownloadUtils.getJson(getTagUrl(parseUrlCharacters(name)))
+        val json = DownloadUtils.getJson(getTagUrl(parseToUrl(name)))
         if (json != null && json.length() > 0) {
             val tag = tagFromJson(json.getJSONObject(0))
             if (tag != null) return tag
@@ -58,10 +58,9 @@ abstract class Api(url: String) {
         val urlBuilder = StringBuilder().append(getPostsUrl(page, tags, limit))
         if (tags.isNotEmpty()) {
             urlBuilder.append("&tags=")
-            for (tag in tags)
-                urlBuilder.append("${URLEncoder.encode(tag, "UTF-8")} ")
-            urlBuilder.deleteCharAt(urlBuilder.lastIndex)
+            urlBuilder.append(parseToUrl(tags.joinToString(" ") { it }))
         }
+        println("[$urlBuilder]")
         val json = DownloadUtils.getJson(urlBuilder.toString())
         return if (json != null) {
             for (i in 0 until json.length()) {
@@ -77,7 +76,7 @@ abstract class Api(url: String) {
         return json?.getJSONObject(0)?.getInt("id") ?: 0
     }
 
-    protected fun parseUrlCharacters(urlStr: String): String {
+    protected fun parseToUrl(urlStr: String): String {
         return URLEncoder.encode(urlStr, "UTF-8")
     }
 }

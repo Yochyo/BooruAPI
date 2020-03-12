@@ -11,11 +11,13 @@ PRIOTITIES:
  */
 object ManagerBuilder {
     fun toManager(api: Api, tagString: String, limit: Int): IManager {
+        val result: IManager
         val splitByOr = tagString.split(" OR ")
         val managers = ArrayList<IManager>()
         for (s in splitByOr) managers += createExcludingManager(api, s, limit)
-        if (managers.size == 1) return managers.first()
-        return ManagerFolder(managers, limit)
+        result = if (managers.size == 1) managers.first()
+        else ManagerFolder(managers, limit)
+        return BufferedManager(result)
     }
 
     private fun createExcludingManager(api: Api, s: String, limit: Int): IManager {

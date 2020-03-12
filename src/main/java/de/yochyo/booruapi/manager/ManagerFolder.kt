@@ -17,7 +17,9 @@ class ManagerFolder(val managers: Collection<IManager>, override val limit: Int)
 
     private val bufferedPosts = TreeSet<Post>()
 
-
+    /**
+     * @return empty ist on end or error
+     */
     override suspend fun downloadNextPage(): List<Post>? {
         return downloadNextPages(1)
     }

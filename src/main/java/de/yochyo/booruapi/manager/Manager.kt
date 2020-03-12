@@ -18,6 +18,9 @@ class Manager(val api: Api, val tags: Array<String>, override val limit: Int) : 
     var currentPage = 1
         private set
 
+    /**
+     * @return empty list on end, null on error
+     */
     override suspend fun downloadNextPage(): List<Post>? {
         return downloadNextPages(1)
     }

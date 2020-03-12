@@ -13,15 +13,20 @@ class ManagerBypassApi(val api: Api, private val tags: Collection<String>, overr
 
     private val t = tags.drop(defaultApiLimit)
 
+    /**
+     * @return returns empty ist on end and null on error or if all elements were filtered
+     */
     override suspend fun downloadNextPages(amount: Int): List<Post>? {
         return mutex.withLock {
             var pages = manager.downloadNextPages(amount)
             if (pages != null) {
+                val isNotEmpty = pages.isNotEmpty()
                 pages = pages.filter {
                     for (tag in t) if (it.tagString.contains(" $tag ")) return@filter false
                     true
                 }
-                posts += pages
+                if (isNotEmpty && pages.isEmpty()) pages = null
+                else posts += pages
             }
             pages
         }

@@ -13,11 +13,13 @@ class ManagerExcluding(private val manager: IManager, private val excluding: Col
         return mutex.withLock {
             var pages = manager.downloadNextPages(amount)
             if (pages != null) {
+                val isNotEmpty = pages.isNotEmpty()
                 pages = pages.filter {
                     for (ex in excluding) if (it.tagString.contains(" $ex ")) return@filter false
                     true
                 }
-                posts += pages
+                if (isNotEmpty && pages.isEmpty()) pages = null
+                else posts += pages
             }
             pages
         }

@@ -22,7 +22,7 @@ class ManagerBypassApi(val api: Api, private val tags: Collection<String>, overr
             if (pages != null) {
                 val isNotEmpty = pages.isNotEmpty()
                 pages = pages.filter {
-                    for (tag in t) if (it.tagString.contains(" $tag ")) return@filter false
+                    for (tag in t) if (!it.tagString.contains(" $tag ")) return@filter false
                     true
                 }
                 if (isNotEmpty && pages.isEmpty()) pages = null

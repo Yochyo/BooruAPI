@@ -1,6 +1,6 @@
 package de.yochyo.booruapi.manager
 
-import de.yochyo.booruapi.api.Api
+import de.yochyo.booruapi.api.IApi
 import de.yochyo.booruapi.objects.Post
 import de.yochyo.eventcollection.EventCollection
 import kotlinx.coroutines.GlobalScope
@@ -9,7 +9,7 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
-class Manager(val api: Api, val tags: Array<String>, override val limit: Int) : IManager {
+class Manager(val api: IApi, val tags: Array<String>, override val limit: Int) : IManager {
     private val mutex = Mutex()
 
     override val posts = EventCollection<Post>(ArrayList())

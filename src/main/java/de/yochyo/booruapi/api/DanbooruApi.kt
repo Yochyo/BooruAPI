@@ -2,9 +2,14 @@ package de.yochyo.booruapi.api
 
 import de.yochyo.booruapi.objects.Post
 import de.yochyo.booruapi.objects.Tag
+import de.yochyo.booruapi.utils.parseURL
 import org.json.JSONObject
 
-class DanbooruApi(url: String) : Api(url) {
+class DanbooruApi(url: String) : IApi {
+    override var username = ""
+    override var passwordHash = ""
+
+    val url = parseURL(url)
     override fun getTagUrl(name: String) = "${url}tags.json?search[name_matches]=$name"
     override fun getMatchingTagsUrl(beginSequence: String, limit: Int): String {
         return "${url}tags.json?search[name_matches]=$beginSequence*&limit=$limit&search[order]=count"
@@ -45,4 +50,5 @@ class DanbooruApi(url: String) : Api(url) {
             null
         }
     }
+
 }

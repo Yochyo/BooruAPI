@@ -1,8 +1,8 @@
 package de.yochyo.booruapi.objects
 
-import de.yochyo.booruapi.api.Api
+import de.yochyo.booruapi.api.IApi
 
-data class Tag(val name: String, val type: Int, val api: Api, val count: Int = 0): Comparable<Tag> {
+data class Tag(val name: String, val type: Int, val api: IApi, val count: Int = 0): Comparable<Tag> {
 
     companion object {
         const val GENERAL = 0

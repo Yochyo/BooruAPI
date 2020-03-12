@@ -2,11 +2,15 @@ package de.yochyo.booruapi.api
 
 import de.yochyo.booruapi.objects.Post
 import de.yochyo.booruapi.objects.Tag
+import de.yochyo.booruapi.utils.parseURL
 import de.yochyo.utils.DownloadUtils
 import kotlinx.coroutines.runBlocking
 import org.json.JSONObject
 
-class MoebooruApi(url: String) : Api(url) {
+class MoebooruApi(url: String) : IApi {
+    val url = parseURL(url)
+    override var username = ""
+    override var passwordHash = ""
     private val utils = MoebooruUtils()
     override fun getTagUrl(name: String): String = "${url}tag.json?name=$name*"
     override fun getMatchingTagsUrl(beginSequence: String, limit: Int): String {

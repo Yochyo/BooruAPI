@@ -19,6 +19,11 @@
             <version>1.1.2</version>
         </dependency>
         <dependency>
+            <groupId>de.yochyo.eventcollection</groupId>
+            <artifactId>EventCollection</artifactId>
+            <version>1.1</version>
+        </dependency>
+        <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
             <version>20190722</version>

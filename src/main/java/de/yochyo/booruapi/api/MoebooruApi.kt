@@ -2,26 +2,29 @@ package de.yochyo.booruapi.api
 
 import de.yochyo.booruapi.objects.Post
 import de.yochyo.booruapi.objects.Tag
-import de.yochyo.booruapi.utils.parseURL
+import de.yochyo.booruapi.utils.parseUFT8
 import de.yochyo.utils.DownloadUtils
 import kotlinx.coroutines.runBlocking
 import org.json.JSONObject
 
-class MoebooruApi(url: String) : IApi {
-    val url = parseURL(url)
-    override var username = ""
-    override var passwordHash = ""
+class MoebooruApi(url: String) : DanbooruApi(url) {
     private val utils = MoebooruUtils()
-    override fun getTagUrl(name: String): String = "${url}tag.json?name=$name*"
-    override fun getMatchingTagsUrl(beginSequence: String, limit: Int): String {
-        return "${url}tag.json?name=$beginSequence*&limit=$limit&search[order]=count"
+
+
+    override suspend fun getMatchingTags(beginSequence: String, limit: Int): List<Tag>? {
+        val json = DownloadUtils.getJson("${url}tag.json?name=$beginSequence*&limit=$limit&search[order]=count")
+        return json?.mapNotNull { if (it is JSONObject) getTagFromJson(it) else null }
     }
 
-    override fun getPostsUrl(page: Int, tags: Array<String>, limit: Int): String {
-        return "${url}post.json?limit=$limit&page=$page&login=$username&password_hash=$passwordHash"
+    override suspend fun getPosts(page: Int, tags: Array<String>, limit: Int): List<Post>? {
+        val urlBuilder = StringBuilder().append("${url}posts.json?limit=$limit&page=$page&login=$username&password_hash=$password")
+        if (tags.isNotEmpty()) urlBuilder.append("&tags=${parseUFT8(tags.joinToString(" ") { it })}")
+
+        val json = DownloadUtils.getJson(urlBuilder.toString())
+        return json?.mapNotNull { if (it is JSONObject) getPostFromJson(it) else null }
     }
 
-    override suspend fun postFromJson(json: JSONObject): Post? {
+    override fun getPostFromJson(json: JSONObject): Post? {
         return try {
             with(json) {
                 return object : Post(getInt("id"), getString("file_url").substringAfterLast("."), getInt("width"), getInt("height"),
@@ -41,10 +44,9 @@ class MoebooruApi(url: String) : IApi {
         }
     }
 
-    override suspend fun tagFromJson(json: JSONObject): Tag? {
+    override fun getTagFromJson(json: JSONObject): Tag? {
         return try {
-            val name = json.getString("name")
-            Tag(name, json.getInt("type"), this@MoebooruApi, json.getInt("count"))
+            Tag(this, json.getString("name"), json.getInt("type"), json.getInt("count"))
         } catch (e: Exception) {
             null
         }
@@ -97,7 +99,7 @@ class MoebooruApi(url: String) : IApi {
                     if (type != Tag.UNKNOWN) {
                         val nameSubstring = subStringType.substring(subStringType.indexOf("href=\"/post?") + 12)
                         val name = nameSubstring.substring(nameSubstring.indexOf(">") + 1, nameSubstring.indexOf("<")).replace(" ", "_")
-                        tags += Tag(name, type, this@MoebooruApi)
+                        tags += Tag(this@MoebooruApi, name, type, 0)
                     }
                 } catch (e: Exception) {
                 }
@@ -106,4 +108,3 @@ class MoebooruApi(url: String) : IApi {
         }
     }
 }
-

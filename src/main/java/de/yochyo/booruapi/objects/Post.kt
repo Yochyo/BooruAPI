@@ -8,7 +8,5 @@ open class Post(open val id: Int, open val extention: String, open val width: In
 
     override fun toString() = "[ID: $id] [${width}x$height]\n$fileURL\n$fileSampleURL\n$filePreviewURL\n{$tagString}"
 
-    override fun compareTo(other: Post): Int {
-        return id.compareTo(other.id)
-    }
+    override fun compareTo(other: Post) = id.compareTo(other.id)
 }

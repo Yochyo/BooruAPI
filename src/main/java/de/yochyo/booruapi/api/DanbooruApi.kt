@@ -10,7 +10,7 @@ import org.json.JSONObject
 import java.security.MessageDigest
 
 open class DanbooruApi(url: String) : IApi {
-    val url = parseURL(url)
+    open val url = parseURL(url)
 
     protected var username = ""
     protected var password = ""

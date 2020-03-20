@@ -2,7 +2,7 @@ package de.yochyo.booruapi.objects
 
 import de.yochyo.booruapi.api.IApi
 
-open class Tag(val api: IApi, val name: String, val type: Int, val count: Int) : Comparable<Tag> {
+open class Tag(open val api: IApi, open val name: String, open val type: Int, open val count: Int) : Comparable<Tag> {
 
     companion object {
         const val GENERAL = 0

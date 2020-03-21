@@ -5,8 +5,8 @@ import de.yochyo.booruapi.objects.Tag
 import de.yochyo.booruapi.utils.isSpecialTag
 import de.yochyo.booruapi.utils.parseUFT8
 import de.yochyo.booruapi.utils.parseURL
+import de.yochyo.json.JSONObject
 import de.yochyo.utils.DownloadUtils
-import org.json.JSONObject
 import java.security.MessageDigest
 
 open class DanbooruApi(url: String) : IApi {

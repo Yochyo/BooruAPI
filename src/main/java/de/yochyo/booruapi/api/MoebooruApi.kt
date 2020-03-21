@@ -3,9 +3,9 @@ package de.yochyo.booruapi.api
 import de.yochyo.booruapi.objects.Post
 import de.yochyo.booruapi.objects.Tag
 import de.yochyo.booruapi.utils.parseUFT8
+import de.yochyo.json.JSONObject
 import de.yochyo.utils.DownloadUtils
 import kotlinx.coroutines.runBlocking
-import org.json.JSONObject
 
 class MoebooruApi(url: String) : DanbooruApi(url) {
     private val utils = MoebooruUtils()

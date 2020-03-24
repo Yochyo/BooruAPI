@@ -2,6 +2,7 @@ package de.yochyo.booruapi.api
 
 import de.yochyo.booruapi.objects.Post
 import de.yochyo.booruapi.objects.Tag
+import de.yochyo.booruapi.utils.isSpecialTag
 import de.yochyo.booruapi.utils.parseUFT8
 import de.yochyo.json.JSONObject
 import de.yochyo.utils.DownloadUtils
@@ -22,6 +23,13 @@ class MoebooruApi(url: String) : DanbooruApi(url) {
 
         val json = DownloadUtils.getJson(urlBuilder.toString())
         return json?.mapNotNull { if (it is JSONObject) getPostFromJson(it) else null }
+    }
+
+    override suspend fun getTag(name: String): Tag? {
+        val json = DownloadUtils.getJson("${url}tag.json?name=$name*")
+        return if (json == null) null
+        else if (json.isEmpty) Tag(this, name, if (isSpecialTag(name)) Tag.SPECIAL else Tag.UNKNOWN, 0)
+        else getTagFromJson(json.getJSONObject(0))
     }
 
     override fun getPostFromJson(json: JSONObject): Post? {

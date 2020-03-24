@@ -17,7 +17,7 @@ class MoebooruApi(url: String) : DanbooruApi(url) {
     }
 
     override suspend fun getPosts(page: Int, tags: Array<String>, limit: Int): List<Post>? {
-        val urlBuilder = StringBuilder().append("${url}posts.json?limit=$limit&page=$page&login=$username&password_hash=$password")
+        val urlBuilder = StringBuilder().append("${url}post.json?limit=$limit&page=$page&login=$username&password_hash=$password")
         if (tags.isNotEmpty()) urlBuilder.append("&tags=${parseUFT8(tags.joinToString(" ") { it })}")
 
         val json = DownloadUtils.getJson(urlBuilder.toString())

@@ -28,7 +28,7 @@ open class DanbooruApi(url: String) : IApi {
             return if (newestID != null) Tag(this, name, Tag.SPECIAL, newestID) else null
         }
 
-        val json = DownloadUtils.getJson("${url}tags.json?search[name_matches]=$name")
+        val json = DownloadUtils.getJson("${url}tags.json?search[name_matches]=${parseUFT8(name)}")
         return if (json == null) null
         else if (json.isEmpty) Tag(this, name, if (isSpecialTag(name)) Tag.SPECIAL else Tag.UNKNOWN, 0)
         else getTagFromJson(json.getJSONObject(0))

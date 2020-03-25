@@ -26,7 +26,7 @@ class MoebooruApi(url: String) : DanbooruApi(url) {
     }
 
     override suspend fun getTag(name: String): Tag? {
-        val json = DownloadUtils.getJson("${url}tag.json?name=$name*")
+        val json = DownloadUtils.getJson("${url}tag.json?name=${parseUFT8(name)}*")
         return if (json == null) null
         else if (json.isEmpty) Tag(this, name, if (isSpecialTag(name)) Tag.SPECIAL else Tag.UNKNOWN, 0)
         else getTagFromJson(json.getJSONObject(0))

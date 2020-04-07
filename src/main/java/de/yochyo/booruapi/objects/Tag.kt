@@ -11,7 +11,6 @@ open class Tag(open val api: IApi, open val name: String, open val type: Int, op
         const val ARTIST = 1
         const val META = 5
         const val UNKNOWN = 99
-        const val SPECIAL = 100
     }
 
     override fun toString(): String = name

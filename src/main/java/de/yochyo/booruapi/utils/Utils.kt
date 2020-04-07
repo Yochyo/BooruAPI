@@ -25,16 +25,6 @@ fun parseURL(url: String): String {
     return b.toString()
 }
 
-fun isSpecialTag(name: String): Boolean {
-    return name == "*" || name.startsWith("height") || name.startsWith("width") || name.startsWith("order") || name.startsWith("rating") || name.contains(" ")
-}
-
-fun getCorrectTagType(tagName: String, type: Int): Int {
-    return if (type in 0..1 || type in 3..5) type
-    else if (isSpecialTag(tagName)) Tag.SPECIAL
-    else Tag.UNKNOWN
-}
-
 fun parseUFT8(urlStr: String): String {
     return URLEncoder.encode(urlStr, "UTF-8")
 }

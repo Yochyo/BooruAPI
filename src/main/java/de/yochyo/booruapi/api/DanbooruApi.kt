@@ -2,7 +2,6 @@ package de.yochyo.booruapi.api
 
 import de.yochyo.booruapi.objects.Post
 import de.yochyo.booruapi.objects.Tag
-import de.yochyo.booruapi.utils.isSpecialTag
 import de.yochyo.booruapi.utils.parseUFT8
 import de.yochyo.booruapi.utils.parseURL
 import de.yochyo.json.JSONObject
@@ -23,15 +22,17 @@ open class DanbooruApi(url: String) : IApi {
     }
 
     override suspend fun getTag(name: String): Tag? {
-        if (name == "*") {
-            val newestID = newestID()
-            return if (newestID != null) Tag(this, name, Tag.SPECIAL, newestID) else null
-        }
-
         val json = DownloadUtils.getJson("${url}tags.json?search[name_matches]=${parseUFT8(name)}")
-        return if (json == null) null
-        else if (json.isEmpty) Tag(this, name, if (isSpecialTag(name)) Tag.SPECIAL else Tag.UNKNOWN, 0)
-        else getTagFromJson(json.getJSONObject(0))
+        return when {
+            json == null -> null
+            json.isEmpty -> {
+                val newestID = newestID()
+                return if (newestID != null) Tag(this, name, Tag.UNKNOWN, newestID)
+                else null
+
+            }
+            else -> getTagFromJson(json.getJSONObject(0))
+        }
     }
 
     override suspend fun getPosts(page: Int, tags: Array<String>, limit: Int): List<Post>? {

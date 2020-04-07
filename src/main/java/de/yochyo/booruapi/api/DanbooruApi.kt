@@ -36,7 +36,7 @@ open class DanbooruApi(url: String) : IApi {
     }
 
     override suspend fun getPosts(page: Int, tags: Array<String>, limit: Int): List<Post>? {
-        val urlBuilder = StringBuilder().append("${url}posts.json?limit=$limit&page=$page&login=$username&password_hash=$password")
+        val urlBuilder = StringBuilder().append("${url}posts.json?limit=$limit&page=$page&login=$username&api_key=$password")
         if (tags.isNotEmpty()) urlBuilder.append("&tags=${parseUFT8(tags.joinToString(" ") { it })}")
 
         val json = DownloadUtils.getJson(urlBuilder.toString())
@@ -47,7 +47,7 @@ open class DanbooruApi(url: String) : IApi {
 
     override suspend fun login(username: String, password: String): Boolean {
         this.username = username
-        this.password = passwordToHash(password)
+        this.password = password
         return true
     }
 
@@ -81,16 +81,5 @@ open class DanbooruApi(url: String) : IApi {
         } catch (e: Exception) {
             null
         }
-    }
-
-    protected open fun passwordToHash(password: String): String {
-        val byteArray = "choujin-steiner--$password--".toByteArray(charset = Charsets.UTF_8)
-        val digest = MessageDigest.getInstance("SHA-1")
-        digest.update(byteArray)
-        val digestBytes = digest.digest()
-        val digestStr = StringBuilder()
-        for (b in digestBytes)
-            digestStr.append(String.format("%02x", b))
-        return digestStr.toString()
     }
 }

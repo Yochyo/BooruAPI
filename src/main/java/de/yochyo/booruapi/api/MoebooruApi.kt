@@ -6,6 +6,7 @@ import de.yochyo.booruapi.utils.parseUFT8
 import de.yochyo.json.JSONObject
 import de.yochyo.utils.DownloadUtils
 import kotlinx.coroutines.runBlocking
+import java.security.MessageDigest
 
 class MoebooruApi(url: String) : DanbooruApi(url) {
     private val utils = MoebooruUtils()
@@ -57,12 +58,29 @@ class MoebooruApi(url: String) : DanbooruApi(url) {
         }
     }
 
+    override suspend fun login(username: String, password: String): Boolean {
+        this.username = username
+        this.password = passwordToHash(password)
+        return true
+    }
+
     override fun getTagFromJson(json: JSONObject): Tag? {
         return try {
             Tag(this, json.getString("name"), json.getInt("type"), json.getInt("count"))
         } catch (e: Exception) {
             null
         }
+    }
+
+    protected open fun passwordToHash(password: String): String {
+        val byteArray = "choujin-steiner--$password--".toByteArray(charset = Charsets.UTF_8)
+        val digest = MessageDigest.getInstance("SHA-1")
+        digest.update(byteArray)
+        val digestBytes = digest.digest()
+        val digestStr = StringBuilder()
+        for (b in digestBytes)
+            digestStr.append(String.format("%02x", b))
+        return digestStr.toString()
     }
 
     private inner class MoebooruUtils {

@@ -4,6 +4,7 @@ import de.yochyo.booruapi.objects.Post
 import de.yochyo.booruapi.objects.Tag
 import de.yochyo.booruapi.utils.parseUFT8
 import de.yochyo.booruapi.utils.parseURL
+import de.yochyo.json.JSONArray
 import de.yochyo.json.JSONObject
 import de.yochyo.utils.DownloadUtils
 import java.security.MessageDigest
@@ -22,7 +23,7 @@ open class DanbooruApi(url: String) : IApi {
     }
 
     override suspend fun getTag(name: String): Tag? {
-        val json = DownloadUtils.getJson("${url}tags.json?search[name_matches]=${parseUFT8(name)}")
+        val json = if(name == "*") JSONArray() else DownloadUtils.getJson("${url}tags.json?search[name_matches]=${parseUFT8(name)}")
         return when {
             json == null -> null
             json.isEmpty -> {

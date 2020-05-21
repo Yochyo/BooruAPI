@@ -35,7 +35,11 @@ class MoebooruApi(url: String) : DanbooruApi(url) {
                 return if (newestID != null) Tag(this, name, Tag.UNKNOWN, newestID)
                 else null
             }
-            else -> getTagFromJson(json.getJSONObject(0))
+            else -> {
+                val tag = getTagFromJson(json.getJSONObject(0))
+                if(tag?.name == name) tag
+                else null
+            }
         }
     }
 

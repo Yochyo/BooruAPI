@@ -27,7 +27,7 @@ class MoebooruApi(url: String) : DanbooruApi(url) {
     }
 
     override suspend fun getTag(name: String): Tag? {
-        val json = if(name == "*") JSONArray() else DownloadUtils.getJson("${url}tag.json?name=${parseUFT8(name)}*")
+        val json = if (name == "*") JSONArray() else DownloadUtils.getJson("${url}tag.json?name=${parseUFT8(name)}*")
         return when {
             json == null -> null
             json.isEmpty -> {
@@ -37,26 +37,34 @@ class MoebooruApi(url: String) : DanbooruApi(url) {
             }
             else -> {
                 val tag = getTagFromJson(json.getJSONObject(0))
-                if(tag?.name == name) tag
+                if (tag?.name == name) tag
                 else null
             }
+        }
+    }
+
+    override fun createPost(id: Int, extention: String, width: Int, height: Int, rating: String,
+                            fileSize: Int, fileURL: String, fileSampleURL: String, filePreviewURL:
+                            String, tags: List<Tag>, tagString: String): Post? {
+        return object : Post(id, extention, width, height,
+                rating, fileSize, fileSampleURL,
+                fileSampleURL, filePreviewURL, tags, tagString, this) {
+            private var tagsWithType: List<Tag>? = null
+            override val tags: List<Tag>
+                get() {
+                    if (tagsWithType == null)
+                        tagsWithType = runBlocking { utils.parseTagsfromURL(url, id) }
+                    return tagsWithType!!
+                }
         }
     }
 
     override fun getPostFromJson(json: JSONObject): Post? {
         return try {
             with(json) {
-                return object : Post(getInt("id"), getString("file_url").substringAfterLast("."), getInt("width"), getInt("height"),
+                return createPost(getInt("id"), getString("file_url").substringAfterLast("."), getInt("width"), getInt("height"),
                         getString("rating"), getInt("file_size"), getString("file_url"),
-                        getString("sample_url"), getString("preview_url"), emptyList(), getString("tags"), this@MoebooruApi) {
-                    private var tagsWithType: List<Tag>? = null
-                    override val tags: List<Tag>
-                        get() {
-                            if (tagsWithType == null)
-                                tagsWithType = runBlocking { utils.parseTagsfromURL(url, getInt("id")) }
-                            return tagsWithType!!
-                        }
-                }
+                        getString("sample_url"), getString("preview_url"), emptyList(), getString("tags"))
             }
         } catch (e: Exception) {
             null

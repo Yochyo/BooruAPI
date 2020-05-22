@@ -52,6 +52,14 @@ open class DanbooruApi(url: String) : IApi {
         return true
     }
 
+    override fun createPost(id: Int, extention: String, width: Int, height: Int, rating: String,
+                                    fileSize: Int, fileURL: String, fileSampleURL: String, filePreviewURL:
+                                    String, tags: List<Tag>, tagString: String): Post? {
+        return object: Post(id, extention, width, height,
+                rating, fileSize, fileSampleURL,
+                fileSampleURL, filePreviewURL, tags, tagString, this){}
+    }
+
 
     protected open fun getTagFromJson(json: JSONObject): Tag? {
         return try {
@@ -75,9 +83,9 @@ open class DanbooruApi(url: String) : IApi {
                 tags += tagsCharacter
                 tags += tagsGeneral
                 tags += tagsMeta
-                Post(getInt("id"), getString("file_ext"), getInt("image_width"), getInt("image_height"),
+                createPost(getInt("id"), getString("file_ext"), getInt("image_width"), getInt("image_height"),
                         getString("rating"), getInt("file_size"), getString("file_url"),
-                        getString("large_file_url"), getString("preview_file_url"), tags, getString("tag_string"), this@DanbooruApi)
+                        getString("large_file_url"), getString("preview_file_url"), tags, getString("tag_string"))
             }
         } catch (e: Exception) {
             null

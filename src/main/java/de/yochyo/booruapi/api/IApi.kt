@@ -12,4 +12,8 @@ interface IApi {
     suspend fun getTag(name: String): Tag?
     suspend fun getPosts(page: Int, tags: Array<String>, limit: Int = DEFAULT_POST_LIMIT): List<Post>?
     suspend fun newestID(): Int?
+
+    fun createPost(id: Int, extention: String, width: Int, height: Int, rating: String, fileSize: Int,
+                           fileURL: String, fileSampleURL: String, filePreviewURL: String,
+                           tags: List<Tag>, tagString: String): Post?
 }

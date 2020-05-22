@@ -27,7 +27,7 @@ class BufferedManager(private val manager: IManager) : IManager by manager {
                 downloads++
             }
             lastDownloadsForPage = max(1, downloads)
-            val result = take(limit)
+            val result = take(limit*amount)
             posts += result
             return result
         }

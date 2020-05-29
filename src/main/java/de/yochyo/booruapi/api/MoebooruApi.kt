@@ -47,7 +47,7 @@ class MoebooruApi(url: String) : DanbooruApi(url) {
                             fileSize: Int, fileURL: String, fileSampleURL: String, filePreviewURL:
                             String, tags: List<Tag>, tagString: String): Post? {
         return object : Post(id, extention, width, height,
-                rating, fileSize, fileSampleURL,
+                rating, fileSize, fileURL,
                 fileSampleURL, filePreviewURL, tags, tagString, this) {
             private var tagsWithType: List<Tag>? = null
             override val tags: List<Tag>

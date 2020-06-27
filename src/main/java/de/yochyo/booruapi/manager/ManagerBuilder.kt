@@ -1,6 +1,6 @@
 package de.yochyo.booruapi.manager
 
-import de.yochyo.booruapi.api.IApi
+import de.yochyo.booruapi.api.IBooruApi
 
 /*
 PRIOTITIES:
@@ -10,7 +10,7 @@ PRIOTITIES:
 4: 'AND'
  */
 object ManagerBuilder {
-    fun toManager(api: IApi, tagString: String, limit: Int): IManager {
+    fun toManager(api: IBooruApi, tagString: String, limit: Int): IManager {
         val result: IManager
         val splitByOr = tagString.split(" OR ")
         val managers = ArrayList<IManager>()
@@ -20,7 +20,7 @@ object ManagerBuilder {
         return BufferedManager(result)
     }
 
-    private fun createExcludingManager(api: IApi, s: String, limit: Int): IManager {
+    private fun createExcludingManager(api: IBooruApi, s: String, limit: Int): IManager {
         fun extractNotStatements(s: String): Pair<Collection<String>, String> { //NotStatements, StatementWithoutNots
             val split = s.split(" ")
             val withoutNots = ArrayList<String>()
@@ -47,7 +47,7 @@ object ManagerBuilder {
     }
 
 
-    private fun createManager(api: IApi, s: String, limit: Int): IManager {
+    private fun createManager(api: IBooruApi, s: String, limit: Int): IManager {
         val splitByAnd = s.split(" AND ")
         println(splitByAnd)
         return if (splitByAnd.size == 1) Manager(api, s.split(" ").toTypedArray(), limit)

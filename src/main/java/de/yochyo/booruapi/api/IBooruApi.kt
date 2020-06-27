@@ -3,7 +3,7 @@ package de.yochyo.booruapi.api
 import de.yochyo.booruapi.objects.Post
 import de.yochyo.booruapi.objects.Tag
 
-interface IApi {
+interface IBooruApi {
     val DEFAULT_POST_LIMIT: Int
     val DEFAULT_TAG_LIMIT: Int
 

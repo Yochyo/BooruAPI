@@ -7,9 +7,8 @@ import de.yochyo.booruapi.utils.parseURL
 import de.yochyo.json.JSONArray
 import de.yochyo.json.JSONObject
 import de.yochyo.utils.DownloadUtils
-import java.security.MessageDigest
 
-open class DanbooruApi(url: String) : IApi {
+open class DanbooruApi(url: String) : IBooruApi {
     open val url = parseURL(url)
 
     protected var username = ""

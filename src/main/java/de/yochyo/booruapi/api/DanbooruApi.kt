@@ -29,7 +29,6 @@ open class DanbooruApi(url: String) : IBooruApi {
                 val newestID = newestID()
                 return if (newestID != null) Tag(this, name, Tag.UNKNOWN, newestID)
                 else null
-
             }
             else -> getTagFromJson(json.getJSONObject(0))
         }

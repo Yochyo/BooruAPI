@@ -49,7 +49,7 @@ class MoebooruApi(url: String) : DanbooruApi(url) {
         return object : Post(id, extention, width, height,
                 rating, fileSize, fileURL,
                 fileSampleURL, filePreviewURL, tags, tagString, this) {
-            private var tagsWithType: List<Tag>? = null
+            private var tagsWithType: List<Tag>? = if(tags.isEmpty()) null else tags
             override val tags: List<Tag>
                 get() {
                     if (tagsWithType == null)

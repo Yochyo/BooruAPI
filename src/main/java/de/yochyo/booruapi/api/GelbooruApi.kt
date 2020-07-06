@@ -40,8 +40,7 @@ open class GelbooruApi(val url: String) : IBooruApi {
     }
 
     override suspend fun getPosts(page: Int, tags: Array<String>, limit: Int): List<Post>? {
-        val checkedLimit = if (limit > 100) 100 else limit
-        val pid = (page - 1) * checkedLimit
+        val pid = (page - 1)
         val url = "$url/index.php?page=dapi&s=post&q=index&json=1&api_key=$password&user_id=$username&limit=$limit&pid=$pid&tags=${tags.joinToString(" ")}"
         val json = DownloadUtils.getJson(url)
         return json?.mapNotNull { if (it is JSONObject) getPostFromJson(it) else null }

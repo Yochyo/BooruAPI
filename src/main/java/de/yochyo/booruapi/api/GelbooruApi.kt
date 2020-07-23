@@ -10,6 +10,14 @@ open class GelbooruApi(val url: String) : IBooruApi {
     private var username = ""
     private var password = ""
 
+    val urlHost: String = try {
+        if (url == "") ""
+        else java.net.URL(url).host
+    } catch (e: Exception) {
+        e.printStackTrace()
+        ""
+    }
+
     override val DEFAULT_POST_LIMIT: Int = 30
     override val DEFAULT_TAG_LIMIT: Int = 10
 
@@ -74,16 +82,16 @@ open class GelbooruApi(val url: String) : IBooruApi {
         }
     }
 
-    //TODO overwork, filepreview url only works for gelbooru.com
     protected open fun getPostFromJson(json: JSONObject): Post? {
         return with(json) {
             val sampleUrl =
-                    if (getInt("sample") == 1) "https://img1.gelbooru.com/samples/${getString("directory")}/sample_${getString("hash")}.jpg"
+
+                    if (getInt("sample") == 1) "https://img1.$urlHost/samples/${getString("directory")}/sample_${getString("hash")}.jpg"
                     else getString("file_url")
             createPost(getInt("id"), getString("file_url").extention() ?: "", getInt("width"),
                     getInt("height"), getString("rating"), -1, getString("file_url"),
                     sampleUrl,
-                    "https://img1.gelbooru.com/thumbnails/${getString("directory")}/thumbnail_${getString("hash")}.jpg",
+                    "https://img1.$urlHost/thumbnails/${getString("directory")}/thumbnail_${getString("hash")}.jpg",
                     emptyList(), getString("tags")
             )
         }

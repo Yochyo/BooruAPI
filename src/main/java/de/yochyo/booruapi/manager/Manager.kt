@@ -10,6 +10,8 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
 class Manager(val api: IBooruApi, val tags: Array<String>, override val limit: Int) : IManager {
+    private val utils = ManagerUtils()
+
     private val mutex = Mutex()
 
     override val posts = EventCollection<Post>(ArrayList())
@@ -36,7 +38,7 @@ class Manager(val api: IBooruApi, val tags: Array<String>, override val limit: I
             var downloadedPages = 0
             for (page in pages) {
                 if (page == null) break
-                page.addFilteredPosts(result)
+                utils.addPageTo(result, page)
                 downloadedPages++
             }
 
@@ -48,11 +50,6 @@ class Manager(val api: IBooruApi, val tags: Array<String>, override val limit: I
                 result
             }
         }
-    }
-
-    private fun List<Post>.addFilteredPosts(copyTo: MutableList<Post>){
-        val lastPostID = if (copyTo.isNotEmpty()) copyTo.last().id else Integer.MAX_VALUE
-        copyTo += this.takeLastWhile { lastPostID > it.id }
     }
 
     override suspend fun clear() {

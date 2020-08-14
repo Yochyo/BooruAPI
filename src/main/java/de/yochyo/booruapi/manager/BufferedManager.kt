@@ -9,7 +9,6 @@ import kotlin.collections.ArrayList
 import kotlin.math.max
 
 class BufferedManager(private val manager: IManager) : IManager by manager {
-    private val utils = ManagerUtils()
     override val posts: EventCollection<Post> = EventCollection(ArrayList())
 
     private val bufferedPosts = LinkedList<Post>()
@@ -23,13 +22,12 @@ class BufferedManager(private val manager: IManager) : IManager by manager {
                 val page = manager.downloadNextPages(lastDownloadsForFullPage * amount)
                 if (page == null) return@withLock null
                 else if (page.isEmpty()) break
-                utils.addPageTo(bufferedPosts, page)
+                ManagerUtils.addAndRemoveDuplicates(bufferedPosts, page)
                 curDownloadsForFullPage++
             }
             lastDownloadsForFullPage = max(1, curDownloadsForFullPage)
             val result = take(limit*amount)
-            posts += result
-            return result
+            return ManagerUtils.addAndRemoveDuplicates(posts, result)
         }
     }
 

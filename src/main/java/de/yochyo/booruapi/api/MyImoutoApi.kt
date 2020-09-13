@@ -20,6 +20,7 @@ class MyImoutoApi(url: String) : DanbooruApi(url) {
     }
 
     override suspend fun getPosts(page: Int, tags: Array<String>, limit: Int): List<Post>? {
+        val tags = tags.filter { it != "*" }
         val urlBuilder = StringBuilder().append("${url}post.json?limit=$limit&page=$page&login=$username&password_hash=$password")
         if (tags.isNotEmpty() && (tags.find { it == "*" } == null)) urlBuilder.append("&tags=${parseUFT8(tags.joinToString(" ") { it })}")
 

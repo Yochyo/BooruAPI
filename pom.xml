@@ -6,7 +6,7 @@
 
     <groupId>de.yochyo.booruapi</groupId>
     <artifactId>BooruAPI</artifactId>
-    <version>1.7.0</version>
+    <version>1.7.1</version>
 
     <properties>
         <kotlin.version>1.3.70</kotlin.version>
@@ -21,7 +21,7 @@
         <dependency>
             <groupId>de.yochyo.eventcollection</groupId>
             <artifactId>EventCollection</artifactId>
-            <version>1.1</version>
+            <version>1.6.3</version>
         </dependency>
         <dependency>
             <groupId>de.yochyo.json</groupId>

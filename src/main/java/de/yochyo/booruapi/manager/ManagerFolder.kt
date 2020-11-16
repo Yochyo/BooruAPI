@@ -1,6 +1,6 @@
 package de.yochyo.booruapi.manager
 
-import de.yochyo.booruapi.objects.Post
+import de.yochyo.booruapi.api.Post
 import de.yochyo.eventcollection.EventCollection
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

@@ -1,14 +1,15 @@
 package de.yochyo.booruapi.manager
 
 import de.yochyo.booruapi.api.IBooruApi
-import de.yochyo.booruapi.objects.Post
+import de.yochyo.booruapi.api.Post
 import de.yochyo.eventcollection.EventCollection
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
 class ManagerBypassApi(val api: IBooruApi, private val tags: Collection<String>, override val limit: Int, defaultApiLimit: Int = 2) : IManager {
     private val mutex = Mutex()
-    private val manager = Manager(api, tags.take(defaultApiLimit).toTypedArray(), limit)
+    //TODO OVERWORK THIS
+    private val manager = Manager(api, tags.take(defaultApiLimit).joinToString(" "), limit)
     override val posts: EventCollection<Post> = EventCollection(ArrayList())
 
     private val t = tags.drop(defaultApiLimit)

@@ -1,6 +1,6 @@
 package de.yochyo.booruapi.manager
 
-import de.yochyo.booruapi.objects.Post
+import de.yochyo.booruapi.api.Post
 
 object ManagerUtils {
     open fun addAndRemoveDuplicates(to: MutableCollection<Post>, page: List<Post>): List<Post> {

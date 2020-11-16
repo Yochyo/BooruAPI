@@ -1,7 +1,7 @@
 package de.yochyo.booruapi.manager
 
 import de.yochyo.booruapi.api.IBooruApi
-import de.yochyo.booruapi.objects.Post
+import de.yochyo.booruapi.api.Post
 import de.yochyo.eventcollection.EventCollection
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
@@ -9,7 +9,7 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
-class Manager(val api: IBooruApi, val tags: Array<String>, override val limit: Int) : IManager {
+class Manager(val api: IBooruApi, val tags: String, override val limit: Int) : IManager {
     private val mutex = Mutex()
 
     override val posts = EventCollection<Post>(ArrayList())
@@ -56,5 +56,5 @@ class Manager(val api: IBooruApi, val tags: Array<String>, override val limit: I
         }
     }
 
-    override fun toString(): String = tags.joinToString(" ") { it }
+    override fun toString(): String = tags
 }

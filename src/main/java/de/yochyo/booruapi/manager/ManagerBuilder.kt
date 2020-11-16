@@ -47,10 +47,10 @@ object ManagerBuilder {
     }
 
 
-    private fun createManager(api: IBooruApi, s: String, limit: Int): IManager {
-        val splitByAnd = s.split(" AND ")
+    private fun createManager(api: IBooruApi, tags: String, limit: Int): IManager {
+        val splitByAnd = tags.split(" AND ")
         println(splitByAnd)
-        return if (splitByAnd.size == 1) Manager(api, s.split(" ").toTypedArray(), limit)
+        return if (splitByAnd.size == 1) Manager(api, tags, limit)
         else ManagerBypassApi(api, splitByAnd.joinToString(" ") { it }.split(" "), limit)
     }
 

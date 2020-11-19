@@ -7,7 +7,6 @@ import com.fasterxml.jackson.module.kotlin.KotlinModule
 import danbooru.DanbooruPost
 import de.yochyo.booruapi.api.BooruUtils
 import de.yochyo.booruapi.api.IBooruApi
-import de.yochyo.booruapi.api.TagType
 import de.yochyo.booruapi.utils.encodeUTF8
 import de.yochyo.json.JSONArray
 import de.yochyo.json.JSONObject
@@ -53,8 +52,19 @@ class DanbooruApi(val host: String) : IBooruApi {
         return json?.mapNotNull { if (it is JSONObject) parsePostFromJson(it) else null }
     }
 
-    fun parsePostFromJson(json: JSONObject): DanbooruPost = mapper.readValue(json.toString(), DanbooruPost::class.java)
-    fun parseTagFromJson(json: JSONObject): DanbooruTag = mapper.readValue(json.toString(), DanbooruTag::class.java)
+    fun parsePostFromJson(json: JSONObject): DanbooruPost? = try {
+        mapper.readValue(json.toString(), DanbooruPost::class.java)
+    } catch (e: Exception) {
+        e.printStackTrace()
+        null
+    }
+
+    fun parseTagFromJson(json: JSONObject): DanbooruTag? = try {
+        mapper.readValue(json.toString(), DanbooruTag::class.java)
+    } catch (e: Exception) {
+        e.printStackTrace()
+        null
+    }
 
     override suspend fun login(username: String, password: String): Boolean {
         this.username = username

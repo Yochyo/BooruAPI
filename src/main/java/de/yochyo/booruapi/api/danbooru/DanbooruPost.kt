@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import de.yochyo.booruapi.api.Post
 import de.yochyo.booruapi.api.Tag
 import de.yochyo.booruapi.api.danbooru.DanbooruTag
+import de.yochyo.booruapi.utils.extension
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -14,7 +15,7 @@ data class DanbooruPost(
         val uploaderId: Int,
         val score: Int,
         val source: String,
-        val md5: String,
+        val md5: String?,
         val lastCommentBumpedAt: Date?,
         override val rating: String,
         val imageWidth: Int,
@@ -22,7 +23,7 @@ data class DanbooruPost(
         override val tagString: String,
         val isNoteLocked: Boolean,
         val favCount: Boolean,
-        @JsonProperty("file_ext") val fileExtension: String,
+        @JsonProperty("file_ext") val fileExtension: String?,
         val lastNotedAt: Date?,
         val isRatingLocked: Boolean,
         val parentId: Int?,
@@ -59,7 +60,7 @@ data class DanbooruPost(
         val fileUrl: String,
         val largeFileUrl: String,
         val previewFileUrl: String
-) : Post(id, fileExtension, imageWidth, imageHeight, rating, fileSize, fileUrl, largeFileUrl, previewFileUrl, tagString) {
+) : Post(id, fileExtension ?: fileUrl.extension(), imageWidth, imageHeight, rating, fileSize, fileUrl, largeFileUrl, previewFileUrl, tagString) {
     private val _tags by lazy {
         ArrayList<Tag>().apply {
             val tagsGeneral = tagStringGeneral.split(" ").filter { it != "" }.map { Tag(it, DanbooruTag.typeToTypeEnum(DanbooruTag.DANBOORU_GENERAL), 0) }

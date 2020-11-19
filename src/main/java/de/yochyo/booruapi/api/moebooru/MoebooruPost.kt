@@ -48,12 +48,13 @@ data class MoebooruPost(
         //TODO val framesPending: String,
         //TODO val framesString: String,
         //TODO val frames: String,
-        val moebooruApi: MoebooruApi? = null
+        var moebooruApi: MoebooruApi? = null
 ) : Post(id, fileUrl.extension(), width, height, rating, fileSize, fileUrl, sampleUrl, previewUrl, tagString) {
 
     private val _tags: List<Tag> by lazy {
-        if (moebooruApi == null) super.getTags()
-        else runBlocking { MoebooruUtils.parseTagsfromURL(moebooruApi.host, id) }
+        val finalApi = moebooruApi
+        if (finalApi == null) super.getTags()
+        else runBlocking { MoebooruUtils.parseTagsfromURL(finalApi.host, id) }
     }
 
     /**

@@ -52,7 +52,7 @@ open class MoebooruApi(val host: String) : IBooruApi {
             }
             else -> {
                 val tag = parseTagFromJson(json.getJSONObject(0))
-                if (tag.name == name) tag
+                if (tag?.name == name) tag
                 else null
             }
         }
@@ -69,7 +69,21 @@ open class MoebooruApi(val host: String) : IBooruApi {
         return digestStr.toString()
     }
 
-    fun parsePostFromJson(json: JSONObject): MoebooruPost = mapper.readValue(json.toString(), MoebooruPost::class.java)
-    fun parseTagFromJson(json: JSONObject): MoebooruTag = mapper.readValue(json.toString(), MoebooruTag::class.java)
+
+    fun parsePostFromJson(json: JSONObject): MoebooruPost? = try {
+        mapper.readValue(json.toString(), MoebooruPost::class.java).apply {
+            moebooruApi = this@MoebooruApi
+        }
+    } catch (e: Exception) {
+        e.printStackTrace()
+        null
+    }
+
+    fun parseTagFromJson(json: JSONObject): MoebooruTag? = try {
+        mapper.readValue(json.toString(), MoebooruTag::class.java)
+    } catch (e: Exception) {
+        e.printStackTrace()
+        null
+    }
 
 }

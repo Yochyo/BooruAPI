@@ -65,10 +65,20 @@ open class GelbooruApi(val url: String) : IBooruApi {
         }
     }
 
-    fun parsePostFromJson(json: JSONObject): GelbooruPost = mapper.readValue(json.toString(), GelbooruPost::class.java).apply {
-        gelbooruApi = this@GelbooruApi
+
+    fun parsePostFromJson(json: JSONObject): GelbooruPost? = try {
+        mapper.readValue(json.toString(), GelbooruPost::class.java).apply {
+            gelbooruApi = this@GelbooruApi
+        }
+    } catch (e: Exception) {
+        e.printStackTrace()
+        null
     }
 
-    fun parseTagFromJson(json: JSONObject): GelbooruTag = mapper.readValue(json.toString(), GelbooruTag::class.java)
-
+    fun parseTagFromJson(json: JSONObject): GelbooruTag? = try {
+        mapper.readValue(json.toString(), GelbooruTag::class.java)
+    } catch (e: Exception) {
+        e.printStackTrace()
+        null
+    }
 }

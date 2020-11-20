@@ -1,21 +1,23 @@
 package de.yochyo.booruapi.api.gelbooru
 
 import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.databind.PropertyNamingStrategies
+import com.fasterxml.jackson.databind.PropertyNamingStrategy
 import com.fasterxml.jackson.databind.json.JsonMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import de.yochyo.booruapi.api.BooruUtils
 import de.yochyo.booruapi.api.IBooruApi
 import de.yochyo.booruapi.api.Tag
 import de.yochyo.booruapi.utils.encodeUTF8
+import de.yochyo.json.JSONArray
 import de.yochyo.json.JSONObject
 import java.text.SimpleDateFormat
+import java.util.*
 
 open class GelbooruApi(val url: String) : IBooruApi {
     private val mapper = JsonMapper.builder().apply {
         addModule(KotlinModule())
-        defaultDateFormat(SimpleDateFormat("EEE MMM d HH:mm:ss Z yyyy"))
-        propertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE)
+        defaultDateFormat(SimpleDateFormat("EEE MMM d HH:mm:ss Z yyyy", Locale.UK))
+        propertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE)
         configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
     }.build()
 
@@ -36,12 +38,14 @@ open class GelbooruApi(val url: String) : IBooruApi {
 
     override suspend fun getTag(name: String): GelbooruTag? {
         val url = "$url/index.php?page=dapi&s=tag&q=index&json=1&api_key=$password&user_id=$username&limit=1&name=${encodeUTF8(name)}"
-        val json = BooruUtils.getJsonArrayFromUrl(url)
+        val json =
+                if (name == "*") JSONArray()
+                else BooruUtils.getJsonArrayFromUrl(url)
         return when {
             json == null -> null
             json.isEmpty -> {
                 val newestID = getNewestPost()?.id
-                return if (newestID != null) GelbooruTag(-1, name, 0, GelbooruTag.GELBOORU_UNKNOWN, false)
+                return if (newestID != null) GelbooruTag(-1, name, newestID, GelbooruTag.GELBOORU_UNKNOWN, false)
                 else null
             }
             else -> parseTagFromJson(json.getJSONObject(0))

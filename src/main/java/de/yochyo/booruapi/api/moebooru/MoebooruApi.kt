@@ -1,7 +1,7 @@
 package de.yochyo.booruapi.api.moebooru
 
 import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.databind.PropertyNamingStrategies
+import com.fasterxml.jackson.databind.PropertyNamingStrategy
 import com.fasterxml.jackson.databind.json.JsonMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import de.yochyo.booruapi.api.BooruUtils
@@ -16,7 +16,7 @@ open class MoebooruApi(val host: String) : IBooruApi {
     private val mapper = JsonMapper.builder().apply {
         addModule(KotlinModule())
         defaultDateFormat(DateFormat.getDateInstance(DateFormat.LONG))
-        propertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE)
+        propertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE)
         configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
     }.build()
 
@@ -47,7 +47,7 @@ open class MoebooruApi(val host: String) : IBooruApi {
             json == null -> null
             json.isEmpty -> {
                 val newestID = getNewestPost()?.id
-                return if (newestID != null) MoebooruTag(0, name, newestID, MoebooruTag.MOEBOORU_UNKNOWN, false)
+                return if (newestID != null) MoebooruTag(-1, name, newestID, MoebooruTag.MOEBOORU_UNKNOWN, false)
                 else null
             }
             else -> {

@@ -1,7 +1,7 @@
 package de.yochyo.booruapi.api.danbooru
 
 import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.databind.PropertyNamingStrategies
+import com.fasterxml.jackson.databind.PropertyNamingStrategy
 import com.fasterxml.jackson.databind.json.JsonMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import danbooru.DanbooruPost
@@ -16,8 +16,8 @@ import java.util.*
 class DanbooruApi(val host: String) : IBooruApi {
     private val mapper = JsonMapper.builder().apply {
         addModule(KotlinModule())
-        defaultDateFormat(SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX"))
-        propertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE)
+        defaultDateFormat(SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX", Locale.UK))
+        propertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE)
         configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
     }.build()
 
@@ -30,11 +30,11 @@ class DanbooruApi(val host: String) : IBooruApi {
                 else BooruUtils.getJsonArrayFromUrl("${host}tags.json?search[name_matches]=${encodeUTF8(name)}")
 
         return when {
-            json == null || json.isEmpty -> null
+            json == null -> null
             json.isEmpty -> {
                 val newestCount = getNewestPost()?.id
                 return if (newestCount == null) null
-                else DanbooruTag(0, "*", newestCount, DanbooruTag.DANBOORU_UNKNOWN, Date(Long.MIN_VALUE), Date(Long.MIN_VALUE), false)
+                else DanbooruTag(-1, name, newestCount, DanbooruTag.DANBOORU_UNKNOWN, Date(), Date(), false)
             }
             else -> parseTagFromJson(json.getJSONObject(0))
         }

@@ -60,7 +60,7 @@ open class GelbooruBetaApi(val host: String) : IBooruApi {
             json == null -> null
             json.isEmpty -> {
                 val newestID = getNewestPost()?.id
-                return if (newestID != null) GelbooruBetaTag(-1, GelbooruBetaTag.GELBOORU_BETA_UNKNOWN, newestID, name, false)
+                return if (newestID != null) GelbooruBetaTag(-1, name, GelbooruBetaTag.GELBOORU_BETA_UNKNOWN, newestID, false)
                 else null
             }
             else -> parseTagFromJson(json.getJSONObject(0))

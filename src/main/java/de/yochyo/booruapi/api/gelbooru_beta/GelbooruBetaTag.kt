@@ -5,9 +5,9 @@ import de.yochyo.booruapi.api.TagType
 
 data class GelbooruBetaTag(
         val id: Int,
+        override val name: String,
         val type: Int,
         override val count: Int,
-        override val name: String,
         val ambiguous: Boolean,
 ) : Tag(name, typeStringToEnum(type), count) {
     companion object {

@@ -49,7 +49,7 @@ open class MyImoutoApi(val host: String) : IBooruApi {
             json == null -> null
             json.isEmpty -> {
                 val newestID = getNewestPost()?.id
-                return if (newestID != null) MyImoutoTag(-1, name, newestID, "", Date(), MyImoutoTag.MY_IMOUTO_UNKNOWN, false)
+                return if (newestID != null) MyImoutoTag(-1, name, MyImoutoTag.MY_IMOUTO_UNKNOWN, newestID, "", Date(), false)
                 else null
             }
             else -> {

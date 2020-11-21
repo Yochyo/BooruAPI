@@ -8,11 +8,11 @@ import java.util.*
 data class MyImoutoTag(
         val id: Int,
         override val name: String,
+        @JsonProperty("tag_type") val type: Int,
         @JsonProperty("post_count") override val count: Int,
         val cachedRelated: String,
         val cachedRelatedExpiresOn: Date,
-        @JsonProperty("tag_type") val type: Int,
-        val isAmbiguous: Boolean
+        val isAmbiguous: Boolean,
 ) : Tag(name, typeToTypeEnum(type), count) {
     companion object {
         const val MY_IMOUTO_GENERAL = 0

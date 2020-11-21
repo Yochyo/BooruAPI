@@ -13,7 +13,25 @@ import java.util.*
 //TODO comments
 data class MoebooruPost(
         override val id: Int,
+
         @JsonProperty("tags") override val tagString: String,
+
+        val fileUrl: String,
+        val jpegUrl: String,
+        val sampleUrl: String,
+        val previewUrl: String,
+
+        override val width: Int,
+        override val height: Int,
+        val sampleWidth: Int,
+        val sampleHeight: Int,
+        val jpegWidth: Int,
+        val jpegHeight: Int,
+        val previewWidth: Int,
+        val previewHeight: Int,
+        val actualPreviewWidth: Int,
+        val actualPreviewHeight: Int,
+
         @JsonDeserialize(using = LongDateDeserializer::class) val createdAt: Date,
         val creatorId: Int,
         val author: String,
@@ -22,33 +40,19 @@ data class MoebooruPost(
         val score: Int,
         val md5: String,
         override val fileSize: Int,
-        val fileUrl: String,
         val isShownInIndex: Boolean,
-        val previewUrl: String,
-        val previewWidth: Int,
-        val previewHeight: Int,
-        val actualPreviewWidth: Int,
-        val actualPreviewHeight: Int,
-        val sampleUrl: String,
-        val sampleWidth: Int,
-        val sampleHeight: Int,
         val sampleFileSize: Int,
-        val jpegUrl: String,
-        val jpegWidth: Int,
-        val jpegHeight: Int,
         val jpegFileSize: Int,
         override val rating: String,
         val hasChildren: Boolean,
         val parentId: Int?,
         val status: String,
-        override val width: Int,
-        override val height: Int,
         val isHeld: Boolean,
         //TODO val framesPendingString: String,
         //TODO val framesPending: String,
         //TODO val framesString: String,
         //TODO val frames: String,
-        var moebooruApi: MoebooruApi? = null
+        var moebooruApi: MoebooruApi? = null,
 ) : Post(id, fileUrl.extension(), width, height, rating, fileSize, fileUrl, sampleUrl, previewUrl, tagString) {
 
     private val _tags: List<Tag> by lazy {

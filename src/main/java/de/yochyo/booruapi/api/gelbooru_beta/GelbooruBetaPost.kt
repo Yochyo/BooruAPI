@@ -10,16 +10,21 @@ import java.net.URL
 import java.util.*
 
 data class GelbooruBetaPost(
-        override val height: Int,
-        val score: Int,
+        override val id: Int,
+
         val fileUrl: String,
-        val parentId: Int,
         @JsonProperty("sample_url") private val _fileSampleURL: String,
         @JsonProperty("preview_url") override val filePreviewURL: String,
-        override val rating: String,
         @JsonProperty("tags") override val tagString: String,
-        override val id: Int,
+
+        override val height: Int,
         override val width: Int,
+        val previewWidth: Int,
+        val previewHeight: Int,
+
+        val score: Int,
+        val parentId: Int,
+        override val rating: String,
         val change: Long,
         val md5: String,
         val creatorId: Int,
@@ -29,8 +34,7 @@ data class GelbooruBetaPost(
         val source: String,
         val hasNotes: Boolean,
         val hasComments: Boolean,
-        val previewWidth: Int,
-        val previewHeight: Int,
+
         var gelbooruBetaApi: GelbooruBetaApi? = null,
 ) : Post(id, fileUrl.extension(), width, height, rating, 0, fileUrl, getSampleUrl(_fileSampleURL), filePreviewURL, tagString) {
 

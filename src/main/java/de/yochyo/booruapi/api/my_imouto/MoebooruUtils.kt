@@ -53,7 +53,7 @@ object MyImoutoUtils {
                 if (type != MyImoutoTag.MY_IMOUTO_UNKNOWN) {
                     val nameSubstring = subStringType.substring(subStringType.indexOf("href=\"/post?") + 12)
                     val name = nameSubstring.substring(nameSubstring.indexOf(">") + 1, nameSubstring.indexOf("<")).replace(" ", "_")
-                    tags += MyImoutoTag(0, name, 0, "", Date(), type, false)
+                    tags += MyImoutoTag(0, name, type, 0, "", Date(), false)
                 }
             } catch (e: Exception) {
             }

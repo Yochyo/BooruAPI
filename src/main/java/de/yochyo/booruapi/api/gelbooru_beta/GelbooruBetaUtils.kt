@@ -53,7 +53,7 @@ object GelbooruBetaUtils {
                 if (type != MoebooruTag.MOEBOORU_UNKNOWN) {
                     val nameSubstring = subStringType.substring(subStringType.indexOf("tags=") + 5)
                     val name = nameSubstring.substring(nameSubstring.indexOf(">") + 1, nameSubstring.indexOf("<")).replace(" ", "_")
-                    tags += GelbooruBetaTag(0, type, 0, name, false)
+                    tags += GelbooruBetaTag(0, name, type, 0, false)
                 }
             } catch (e: Exception) {
             }

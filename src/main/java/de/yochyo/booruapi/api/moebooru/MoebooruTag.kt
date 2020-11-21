@@ -6,9 +6,9 @@ import de.yochyo.booruapi.api.TagType
 data class MoebooruTag(
         val id: Int,
         override val name: String,
-        override val count: Int,
         val type: Int,
-        val ambiguous: Boolean
+        override val count: Int,
+        val ambiguous: Boolean,
 ) : Tag(name, typeToTypeEnum(type), count) {
     companion object {
         const val MOEBOORU_GENERAL = 0

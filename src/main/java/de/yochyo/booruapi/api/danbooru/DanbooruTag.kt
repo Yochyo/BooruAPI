@@ -9,11 +9,11 @@ import java.util.*
 data class DanbooruTag(
         val id: Int,
         override val name: String,
-        @JsonProperty("post_count") override val count: Int,
         @JsonProperty("category") val type: Int,
+        @JsonProperty("post_count") override val count: Int,
         val createdAt: Date,
         val updatedAt: Date,
-        val isLocked: Boolean
+        val isLocked: Boolean,
 ) : Tag(name, typeToTypeEnum(type), count) {
     companion object {
         const val DANBOORU_GENERAL = 0

@@ -11,28 +11,46 @@ import kotlin.collections.ArrayList
 //TODO comments
 data class DanbooruPost(
         override val id: Int,
-        val createdAt: Date,
-        val uploaderId: Int,
-        val score: Int,
-        val source: String,
-        val md5: String?,
-        val lastCommentBumpedAt: Date?,
-        override val rating: String,
-        val imageWidth: Int,
-        val imageHeight: Int,
+
         override val tagString: String,
-        val isNoteLocked: Boolean,
-        val favCount: Boolean,
-        @JsonProperty("file_ext") val fileExtension: String?,
-        val lastNotedAt: Date?,
-        val isRatingLocked: Boolean,
-        val parentId: Int?,
-        val hasChildren: Boolean,
-        val approverId: Int?,
+        val tagStringGeneral: String,
+        val tagStringCharacter: String,
+        val tagStringCopyright: String,
+        val tagStringArtist: String,
+        val tagStringMeta: String,
+        val tagCount: Int,
         val tagCountGeneral: Int,
         val tagCountArtist: Int,
         val tagCountCharacter: Int,
         val tagCountCopyright: Int,
+
+
+        val fileUrl: String,
+        val previewFileUrl: String,
+        val largeFileUrl: String,
+
+        @JsonProperty("image_width") override val width: Int,
+        @JsonProperty("image_height") override val height: Int,
+
+        override val rating: String,
+        val score: Int,
+        val md5: String?,
+        val createdAt: Date,
+        val source: String,
+        @JsonProperty("file_ext") val fileExtension: String?,
+
+        val lastCommentBumpedAt: Date?,
+        val isNoteLocked: Boolean,
+        val favCount: Boolean,
+
+        val parentId: Int?,
+        val hasChildren: Boolean,
+
+
+        val lastNotedAt: Date?,
+        val isRatingLocked: Boolean,
+        val approverId: Int?,
+        val uploaderId: Int,
         override val fileSize: Int,
         val isStatusLocked: Boolean,
         val poolString: String,
@@ -41,7 +59,6 @@ data class DanbooruPost(
         val isPending: Boolean,
         val isFlagged: Boolean,
         val isDeleted: Boolean,
-        val tagCount: Int,
         val updatedAt: Date,
         val isBanned: Boolean,
         val pixivId: Int?,
@@ -52,15 +69,8 @@ data class DanbooruPost(
         val hasLarge: Boolean,
         val hasVisibleChildren: Boolean,
         val isFavorited: Boolean,
-        val tagStringGeneral: String,
-        val tagStringCharacter: String,
-        val tagStringCopyright: String,
-        val tagStringArtist: String,
-        val tagStringMeta: String,
-        val fileUrl: String,
-        val largeFileUrl: String,
-        val previewFileUrl: String
-) : Post(id, fileExtension ?: fileUrl.extension(), imageWidth, imageHeight, rating, fileSize, fileUrl, largeFileUrl, previewFileUrl, tagString) {
+) : Post(id, fileExtension
+        ?: fileUrl.extension(), width, height, rating, fileSize, fileUrl, largeFileUrl, previewFileUrl, tagString) {
     private val _tags by lazy {
         ArrayList<Tag>().apply {
             val tagsGeneral = tagStringGeneral.split(" ").filter { it != "" }.map { Tag(it, DanbooruTag.typeToTypeEnum(DanbooruTag.DANBOORU_GENERAL), 0) }

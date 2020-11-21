@@ -10,13 +10,13 @@ import de.yochyo.booruapi.utils.encodeUTF8
 import de.yochyo.json.JSONArray
 import de.yochyo.json.JSONObject
 import java.security.MessageDigest
-import java.text.DateFormat
+import java.text.SimpleDateFormat
 import java.util.*
 
 open class MyImoutoApi(val host: String) : IBooruApi {
     private val mapper = JsonMapper.builder().apply {
         addModule(KotlinModule())
-        defaultDateFormat(DateFormat.getDateInstance(DateFormat.LONG))
+        defaultDateFormat(SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.UK))
         propertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE)
         configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
     }.build()

@@ -64,7 +64,7 @@ data class DanbooruPost(
     private val _tags by lazy {
         ArrayList<Tag>().apply {
             val tagsGeneral = tagStringGeneral.split(" ").filter { it != "" }.map { Tag(it, DanbooruTag.typeToTypeEnum(DanbooruTag.DANBOORU_GENERAL), 0) }
-            val tagsCharacter = tagStringCharacter.split(" ").filter { it != "" }.map { Tag(it, DanbooruTag.typeToTypeEnum(DanbooruTag.DANBOORU_GENERAL), 0) }
+            val tagsCharacter = tagStringCharacter.split(" ").filter { it != "" }.map { Tag(it, DanbooruTag.typeToTypeEnum(DanbooruTag.DANBOORU_CHARACTER), 0) }
             val tagsCopyright = tagStringCopyright.split(" ").filter { it != "" }.map { Tag(it, DanbooruTag.typeToTypeEnum(DanbooruTag.DANBOORU_COPYRIGHT), 0) }
             val tagsArtist = tagStringArtist.split(" ").filter { it != "" }.map { Tag(it, DanbooruTag.typeToTypeEnum(DanbooruTag.DANBOORU_ARTIST), 0) }
             val tagsMeta = tagStringMeta.split(" ").filter { it != "" }.map { Tag(it, DanbooruTag.typeToTypeEnum(DanbooruTag.DANBOORU_META), 0) }

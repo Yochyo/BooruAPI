@@ -10,12 +10,10 @@ import de.yochyo.booruapi.utils.encodeUTF8
 import de.yochyo.json.JSONArray
 import de.yochyo.json.JSONObject
 import java.security.MessageDigest
-import java.text.DateFormat
 
 open class MoebooruApi(val host: String) : IBooruApi {
     private val mapper = JsonMapper.builder().apply {
         addModule(KotlinModule())
-        defaultDateFormat(DateFormat.getDateInstance(DateFormat.LONG))
         propertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE)
         configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
     }.build()

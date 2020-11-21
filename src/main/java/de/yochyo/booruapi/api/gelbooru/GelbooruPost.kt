@@ -32,7 +32,7 @@ data class GelbooruPost(
         var gelbooruApi: GelbooruApi? = null,
 ) : Post(
         id, imageName.extension(), width, height, rating, -1, fileUrl,
-        getSampleUrl(fileUrl, directory, hash),
+        if (sample) getSampleUrl(fileUrl, directory, hash) else fileUrl,
         getPreviewUrl(fileUrl, directory, hash), tagString) {
     private val _tags by lazy {
         if (gelbooruApi == null) super.getTags()

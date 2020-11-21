@@ -58,13 +58,19 @@ open class GelbooruBetaApi(val host: String) : IBooruApi {
 
         return when {
             json == null -> null
-            json.isEmpty -> {
-                val newestID = getNewestPost()?.id
-                return if (newestID != null) GelbooruBetaTag(-1, name, GelbooruBetaTag.GELBOORU_BETA_UNKNOWN, newestID, false)
-                else null
+            json.isEmpty -> getDefaultTag(name)
+            else -> {
+                val tag = parseTagFromJson(json.getJSONObject(0))
+                if (tag?.name == name) tag
+                else getDefaultTag(name)
             }
-            else -> parseTagFromJson(json.getJSONObject(0))
         }
+    }
+
+    private suspend fun getDefaultTag(name: String): GelbooruBetaTag? {
+        val newestID = getNewestPost()?.id
+        return if (newestID != null) GelbooruBetaTag(-1, name, GelbooruBetaTag.GELBOORU_BETA_UNKNOWN, newestID, false)
+        else null
     }
 
     override suspend fun getPosts(page: Int, tags: String, limit: Int): List<GelbooruBetaPost>? {

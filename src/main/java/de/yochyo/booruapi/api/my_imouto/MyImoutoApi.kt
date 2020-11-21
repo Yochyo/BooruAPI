@@ -47,17 +47,19 @@ open class MyImoutoApi(val host: String) : IBooruApi {
         val json = if (name == "*") JSONArray() else BooruUtils.getJsonArrayFromUrl("${host}tag.json?name=${encodeUTF8(name)}*")
         return when {
             json == null -> null
-            json.isEmpty -> {
-                val newestID = getNewestPost()?.id
-                return if (newestID != null) MyImoutoTag(-1, name, MyImoutoTag.MY_IMOUTO_UNKNOWN, newestID, "", Date(), false)
-                else null
-            }
+            json.isEmpty -> getDefaultTag(name)
             else -> {
                 val tag = parseTagFromJson(json.getJSONObject(0))
                 if (tag?.name == name) tag
-                else null
+                else getDefaultTag(name)
             }
         }
+    }
+
+    private suspend fun getDefaultTag(name: String): MyImoutoTag? {
+        val newestID = getNewestPost()?.id
+        return if (newestID != null) MyImoutoTag(-1, name, MyImoutoTag.MY_IMOUTO_UNKNOWN, newestID, "", Date(), false)
+        else null
     }
 
     protected fun passwordToHash(password: String): String {

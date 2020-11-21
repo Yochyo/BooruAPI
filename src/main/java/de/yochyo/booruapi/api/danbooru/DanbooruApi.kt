@@ -31,13 +31,20 @@ class DanbooruApi(val host: String) : IBooruApi {
 
         return when {
             json == null -> null
-            json.isEmpty -> {
-                val newestCount = getNewestPost()?.id
-                return if (newestCount == null) null
-                else DanbooruTag(-1, name, newestCount, DanbooruTag.DANBOORU_UNKNOWN, Date(), Date(), false)
+            json.isEmpty -> getDefaultTag(name)
+            else -> {
+                val tag = parseTagFromJson(json.getJSONObject(0))
+                if (tag?.name == name) tag
+                else getDefaultTag(name)
             }
-            else -> parseTagFromJson(json.getJSONObject(0))
         }
+    }
+
+    private suspend fun getDefaultTag(name: String): DanbooruTag? {
+        val newestCount = getNewestPost()?.id
+        return if (newestCount == null) null
+        else DanbooruTag(-1, name, newestCount, DanbooruTag.DANBOORU_UNKNOWN, Date(), Date(), false)
+
     }
 
     override suspend fun getTagAutoCompletion(begin: String, limit: Int): List<DanbooruTag>? {

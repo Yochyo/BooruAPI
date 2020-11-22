@@ -58,7 +58,7 @@ data class MoebooruPost(
     private val _tags: List<Tag> by lazy {
         val finalApi = moebooruApi
         if (finalApi == null) super.getTags()
-        else runBlocking { MoebooruUtils.parseTagsfromURL(finalApi.host, id) }
+        else runBlocking { MoebooruUtils.parseTagsFromUrl(finalApi.host, id) ?: super.getTags() }
     }
 
     /**

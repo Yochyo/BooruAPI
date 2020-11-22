@@ -54,7 +54,7 @@ data class GelbooruBetaPost(
     private val _tags: List<Tag> by lazy {
         val finalApi = gelbooruBetaApi
         if (finalApi == null) super.getTags()
-        else runBlocking { GelbooruBetaUtils.parseTagsfromURL(finalApi.host, id) }
+        else runBlocking { GelbooruBetaUtils.parseTagsFromUrl(finalApi.host, id) ?: super.getTags() }
     }
 
     /**

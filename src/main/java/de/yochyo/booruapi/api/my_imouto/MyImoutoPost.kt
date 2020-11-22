@@ -58,7 +58,7 @@ data class MyImoutoPost(
     private val _tags: List<Tag> by lazy {
         val finalApi = myImoutoApi
         if (finalApi == null) super.getTags()
-        else runBlocking { MyImoutoUtils.parseTagsfromURL(finalApi.host, id) }
+        else runBlocking { MyImoutoUtils.parseTagsFromUrl(finalApi.host, id) ?: super.getTags() }
     }
 
     /**

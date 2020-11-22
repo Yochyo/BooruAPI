@@ -1,11 +1,13 @@
-package de.yochyo.booruapi.api.moebooru
+package de.yochyo.booruapi.api.my_imouto
 
 import de.yochyo.booruapi.BooruTagSelector
+import de.yochyo.booruapi.api.moebooru.MoebooruTag
 import org.jsoup.nodes.Element
+import java.util.*
 
 //TODO comments
-object MoebooruUtils {
-    private val selector = object : BooruTagSelector<MoebooruTag, Int>() {
+object MyImoutoUtils {
+    private val selector = object : BooruTagSelector<MyImoutoTag, Int>() {
 
         override fun getType(element: Element): Int {
             val type = element.attr("data-type")
@@ -24,13 +26,13 @@ object MoebooruUtils {
             return element.attr("data-name")
         }
 
-        override fun toTag(name: String, type: Int): MoebooruTag {
-            return MoebooruTag(0, name, type, 0, false)
+        override fun toTag(name: String, type: Int): MyImoutoTag {
+            return MyImoutoTag(0, name, type, 0, "", Date(), false)
         }
 
     }
 
-    suspend fun parseTagsFromUrl(host: String, id: Int): List<MoebooruTag>? {
+    suspend fun parseTagsFromUrl(host: String, id: Int): List<MyImoutoTag>? {
         return selector.parse("$host/post/show/$id")?.map { it.copy(name = it.name.replace(" ", "_")) }
     }
 }

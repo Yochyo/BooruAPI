@@ -13,7 +13,7 @@ object GelbooruBetaUtils {
             if (type.contains("tag-type-artist")) return GelbooruBetaTag.GELBOORU_BETA_ARTIST
             if (type.contains("tag-type-copyright")) return GelbooruBetaTag.GELBOORU_BETA_COPYRIGHT
             if (type.contains("tag-type-character")) return GelbooruBetaTag.GELBOORU_BETA_CHARACTER
-            if (type.contains("tag-type-style")) return GelbooruBetaTag.GELBOORU_BETA_META
+            if (type.contains("tag-type-metadata")) return GelbooruBetaTag.GELBOORU_BETA_META
             return GelbooruBetaTag.GELBOORU_BETA_UNKNOWN
         }
 

@@ -12,16 +12,18 @@ package de.yochyo.booruapi.api
  * @param filePreviewURL Url to preview, preview is compressed to ~100x100 or less
  * @param tagString String containing all tags of a post
  */
-open class Post(open val id: Int,
-                open val extension: String,
-                open val width: Int,
-                open val height: Int,
-                open val rating: String,
-                open val fileSize: Int,
-                open val fileURL: String,
-                open val fileSampleURL: String,
-                open val filePreviewURL: String,
-                open val tagString: String) : Comparable<Post> {
+open class Post(
+        open val id: Int,
+        open val extension: String,
+        open val width: Int,
+        open val height: Int,
+        open val rating: String,
+        open val fileSize: Int,
+        open val fileURL: String,
+        open val fileSampleURL: String,
+        open val filePreviewURL: String,
+        open val tagString: String,
+) : Comparable<Post> {
 
     /**
      * Returns a list with all tags of a post. By default, all tags have default values.
@@ -29,7 +31,7 @@ open class Post(open val id: Int,
      * @return
      */
     open fun getTags(): List<Tag> {
-        return tagString.split(" ").map { Tag(it, TagType.UNKNOWN, 0) }
+        return tagString.split(" ").map { Tag(it, TagType.UNKNOWN, 0) }.filter { it.name != "" }
     }
 
     override fun toString() = "[ID: $id] [${width}x$height]\n$fileURL\n$fileSampleURL\n$filePreviewURL\n{$tagString}"

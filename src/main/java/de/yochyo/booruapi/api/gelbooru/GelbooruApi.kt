@@ -53,7 +53,7 @@ open class GelbooruApi(val host: String) : IBooruApi {
 
     private suspend fun getDefaultTag(name: String): GelbooruTag? {
         val newestID = getNewestPost()?.id
-        return if (newestID != null) GelbooruTag(-1, name, newestID, GelbooruTag.GELBOORU_UNKNOWN, false)
+        return if (newestID != null) GelbooruTag(-1, name, GelbooruTag.GELBOORU_UNKNOWN, newestID, false)
         else null
     }
 

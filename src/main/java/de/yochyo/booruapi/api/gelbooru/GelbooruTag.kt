@@ -10,9 +10,9 @@ import de.yochyo.booruapi.deserializers.NumericBooleanDeserializer
 data class GelbooruTag(
         val id: Int,
         @JsonProperty("tag") override val name: String,
-        override val count: Int,
         @JsonProperty("type") val typeString: String,
-        @JsonDeserialize(using = NumericBooleanDeserializer::class) val ambiguous: Boolean = false
+        override val count: Int,
+        @JsonDeserialize(using = NumericBooleanDeserializer::class) val ambiguous: Boolean = false,
 ) : Tag(name, typeStringToEnum(typeString), count) {
     companion object {
         const val GELBOORU_GENERAL = "tag"

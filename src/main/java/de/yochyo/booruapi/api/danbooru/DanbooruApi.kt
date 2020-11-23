@@ -43,7 +43,7 @@ class DanbooruApi(val host: String) : IBooruApi {
     private suspend fun getDefaultTag(name: String): DanbooruTag? {
         val newestCount = getNewestPost()?.id
         return if (newestCount == null) null
-        else DanbooruTag(-1, name, newestCount, DanbooruTag.DANBOORU_UNKNOWN, Date(), Date(), false)
+        else DanbooruTag(-1, name, DanbooruTag.DANBOORU_UNKNOWN, newestCount, Date(), Date(), false)
 
     }
 

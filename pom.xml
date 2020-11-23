@@ -6,7 +6,7 @@
 
     <groupId>de.yochyo.booruapi</groupId>
     <artifactId>BooruAPI</artifactId>
-    <version>1.9.3</version>
+    <version>1.9.4</version>
 
     <properties>
         <kotlin.version>1.4.10</kotlin.version>

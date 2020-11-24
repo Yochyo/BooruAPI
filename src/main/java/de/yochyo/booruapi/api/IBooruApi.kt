@@ -2,6 +2,7 @@ package de.yochyo.booruapi.api
 
 
 interface IBooruApi {
+    val host: String
     /**
      * Will either login the user or allow him/her to access data with his/her account.
      * @param username Username. Depending on the Api, it may be an id or email

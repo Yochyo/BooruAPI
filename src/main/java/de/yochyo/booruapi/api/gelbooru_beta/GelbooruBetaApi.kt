@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.json.JsonMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import de.yochyo.booruapi.api.BooruUtils
 import de.yochyo.booruapi.api.IBooruApi
+import de.yochyo.booruapi.api.autocompletion.ITagAutoCompletion
 import de.yochyo.booruapi.utils.encodeUTF8
 import de.yochyo.json.JSONArray
 import de.yochyo.json.JSONObject
@@ -13,7 +14,7 @@ import de.yochyo.json.XML
 import java.text.SimpleDateFormat
 import java.util.*
 
-open class GelbooruBetaApi(val host: String) : IBooruApi {
+open class GelbooruBetaApi(override val host: String, private val autoCompletionMethod: ITagAutoCompletion<GelbooruBetaApi, GelbooruBetaTag> = GelbooruBetaAutoCompletionMethods.WITH_PHP_SCRIPT) : IBooruApi {
     private val mapper = JsonMapper.builder().apply {
         addModule(KotlinModule())
         defaultDateFormat(SimpleDateFormat("EEE MMM d HH:mm:ss Z yyyy", Locale.UK))
@@ -31,15 +32,7 @@ open class GelbooruBetaApi(val host: String) : IBooruApi {
     }
 
     override suspend fun getTagAutoCompletion(begin: String, limit: Int): List<GelbooruBetaTag>? {
-        val url = "$host/index.php?page=dapi&s=tag&q=index&json=1&api_key=$password&user_id=$username&limit=$limit&name_pattern=${encodeUTF8(begin)}%"
-        val xml = BooruUtils.getStringFromUrl(url) ?: return null
-        val jsonParent = XML.toJSONObject(xml)
-        val json = jsonParent.getJSONObject("tags").let { if (it.has("tag")) it.get("tag") else JSONArray() }
-        return when {
-            json is JSONObject -> listOf(parseTagFromJson(json)).mapNotNull { it }
-            json is JSONArray -> json.mapNotNull { if (it is JSONObject) parseTagFromJson(it) else null }
-            else -> null
-        }
+        return autoCompletionMethod.getTagAutoCompletion(this, begin, limit)
     }
 
     override suspend fun getTag(name: String): GelbooruBetaTag? {

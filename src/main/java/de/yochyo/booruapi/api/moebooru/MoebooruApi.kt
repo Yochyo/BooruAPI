@@ -11,7 +11,7 @@ import de.yochyo.json.JSONArray
 import de.yochyo.json.JSONObject
 import java.security.MessageDigest
 
-open class MoebooruApi(val host: String) : IBooruApi {
+open class MoebooruApi(override val host: String) : IBooruApi {
     private val mapper = JsonMapper.builder().apply {
         addModule(KotlinModule())
         propertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE)
@@ -26,7 +26,6 @@ open class MoebooruApi(val host: String) : IBooruApi {
         this.password = passwordToHash(password)
         return true
     }
-
 
     override suspend fun getTagAutoCompletion(begin: String, limit: Int): List<MoebooruTag>? {
         val json = BooruUtils.getJsonArrayFromUrl("${host}tag.json?name=${encodeUTF8(begin)}*&limit=$limit&search[order]=count")

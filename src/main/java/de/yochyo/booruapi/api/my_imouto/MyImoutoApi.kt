@@ -13,7 +13,7 @@ import java.security.MessageDigest
 import java.text.SimpleDateFormat
 import java.util.*
 
-open class MyImoutoApi(val host: String) : IBooruApi {
+open class MyImoutoApi(override val host: String) : IBooruApi {
     private val mapper = JsonMapper.builder().apply {
         addModule(KotlinModule())
         defaultDateFormat(SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.UK))

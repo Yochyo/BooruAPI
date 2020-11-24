@@ -13,7 +13,7 @@ import de.yochyo.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.*
 
-class DanbooruApi(val host: String) : IBooruApi {
+class DanbooruApi(override val host: String) : IBooruApi {
     private val mapper = JsonMapper.builder().apply {
         addModule(KotlinModule())
         defaultDateFormat(SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX", Locale.UK))

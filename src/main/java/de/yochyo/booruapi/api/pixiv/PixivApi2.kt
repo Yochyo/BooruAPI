@@ -5,19 +5,20 @@ import de.yochyo.booruapi.api.Post
 import de.yochyo.booruapi.api.Tag
 import de.yochyo.booruapi.api.TagType
 import de.yochyo.pixiv_api.PixivApi
-import de.yochyo.pixiv_api.request_types.PixivParams
 import de.yochyo.pixiv_api.response_types.PixivIllustSearch
 import de.yochyo.pixiv_api.response_types.PixivUser
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import java.util.*
 import kotlin.collections.HashMap
 
+
 class PixivApi2 : IBooruApi {
-    override val host: String = ""
+    override val host: String = "https://pixiv.net/"
     private var refreshToken: String? = null
 
-    private val api = PixivApi()
+    val api = PixivApi().apply { setLanguage("en-us") }
 
     /**
      * password is refreshToken if username is empty
@@ -37,10 +38,13 @@ class PixivApi2 : IBooruApi {
         }
     }
 
-    override suspend fun getTag(name: String): PixivTag? {
-        val user = GlobalScope.async { getUserTag(name) }
-        val tag = GlobalScope.async { getIllustTag(name) }
-        return user.await() ?: tag.await()
+    override suspend fun getTag(name: String): PixivTag {
+        val tag = try {
+            getUserTag(name)
+        } catch (e: Exception) {
+            null
+        }
+        return tag ?: PixivTag(name, TagType.UNKNOWN, 0)
     }
 
     suspend fun getUserTag(name: String): PixivTag? {
@@ -54,39 +58,33 @@ class PixivApi2 : IBooruApi {
         return null
     }
 
-    suspend fun getIllustTag(name: String): PixivTag? {
+    override suspend fun getTagAutoCompletion(begin: String, limit: Int): List<Tag>? {
         try {
-            val tags = api.searchAutoCompletion(name)
-            val tag = tags.tags.firstOrNull { it.name.equals(name, true) || it.translatedName.equals(name, true) }
-            if (tag != null) return pixivTagToTag(tag)
+            val users = GlobalScope.async {
+                try {
+                    api.searchUser(begin)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    null
+                }
+            }
+            val tags = GlobalScope.async {
+                try {
+                    api.searchAutoCompletion(begin)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    null
+                }
+            }
+            return mergeTagsBySimilarity(
+                begin,
+                users.await()?.userPreviews?.map { pixivUserToTag(it.user) } ?: emptyList(),
+                tags.await()?.tags?.mapNotNull { pixivTagToTag(it) } ?: emptyList()
+            )
         } catch (e: Exception) {
             e.printStackTrace()
         }
         return null
-    }
-
-    override suspend fun getTagAutoCompletion(begin: String, limit: Int): List<Tag>? {
-        val users = GlobalScope.async {
-            try {
-                api.searchUser(begin)
-            } catch (e: Exception) {
-                e.printStackTrace()
-                null
-            }
-        }
-        val tags = GlobalScope.async {
-            try {
-                api.searchAutoCompletion(begin)
-            } catch (e: Exception) {
-                e.printStackTrace()
-                null
-            }
-        }
-        return mergeTagsBySimilarity(
-            begin,
-            users.await()?.userPreviews?.map { pixivUserToTag(it.user) } ?: emptyList(),
-            tags.await()?.tags?.mapNotNull { pixivTagToTag(it) } ?: emptyList()
-        )
     }
 
     private fun mergeTagsBySimilarity(base: String, vararg tags: List<PixivTag>): List<PixivTag> {
@@ -126,13 +124,30 @@ class PixivApi2 : IBooruApi {
         return tags.sortedBy { levenshtein(it.name) }
     }
 
-    private val cachedTags = HashMap<String, Int>() //tag, userId
-    override suspend fun getPosts(page: Int, tags: String, limit: Int): List<Post>? {
-        val userId = cachedTags[tags] ?: getUserTag(tags)?.id ?: -1
-        cachedTags[tags] = userId
 
-        return if (userId == -1) api.searchIllust(tags, PixivParams(offset = (page - 1) * 30)).toPosts()
-        else api.getUserIllusts(userId, PixivParams(offset = (page - 1) * 30)).toPosts()
+    private suspend fun getIllustsFirstPage(tags: String): PixivIllustSearch? {
+        try {
+            if (tags == "*") return api.getNewIllusts()
+            val illusts = GlobalScope.async(Dispatchers.IO) { api.searchIllust(tags) }
+            val userId = getUserTag(tags)?.id ?: -1
+
+            return if (userId == -1) illusts.await()
+            else api.getUserIllusts(userId)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        return null
+    }
+
+    private val searches = HashMap<String, PixivIllustSearchList>()
+    override suspend fun getPosts(page: Int, tags: String, limit: Int): List<Post>? {
+        var search = searches[tags]
+        if (search == null) {
+            val illusts = getIllustsFirstPage(tags) ?: return null
+            search = PixivIllustSearchList(api, illusts)
+            searches[tags] = search
+        }
+        return search.get(page)?.toPosts()
     }
 
     fun PixivIllustSearch.toPosts() = this.illusts.map { PixivPost(it) }
@@ -144,6 +159,10 @@ class PixivApi2 : IBooruApi {
     private fun pixivTagToTag(tag: de.yochyo.pixiv_api.response_types.PixivTag): PixivTag? {
         val name = tag.translatedName ?: tag.name ?: return null
 //        TODO()//tagtype
-        return PixivTag(name, TagType.UNKNOWN, -1)
+        return PixivTag(name, TagType.GENERAL, -1)
+    }
+
+    override fun getHeaders(): Map<String, String> {
+        return api.additionalHeaders
     }
 }

@@ -1,8 +1,15 @@
 package de.yochyo.booruapi.api
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import java.io.InputStream
+import java.net.HttpURLConnection
+import java.net.URL
+
 
 interface IBooruApi {
     val host: String
+
     /**
      * Will either login the user or allow him/her to access data with his/her account.
      * @param username Username. Depending on the Api, it may be an id or email
@@ -31,8 +38,27 @@ interface IBooruApi {
      * Returns a List of posts
      * @param page page of posts, the first page should always have the index 1
      * @param limit Limit of posts a page can contain. Depending on the api, the limit may be limited
-     * @return Returns a List of posts or null if error
+     * @return Returns a List of posts or null if error. Returns an empty list if reached end
      */
     suspend fun getPosts(page: Int, tags: String, limit: Int): List<Post>?
     suspend fun getNewestPost(): Post? = getPosts(1, "*", 1)?.firstOrNull()
+
+    suspend fun getUrlInputStream(url: String): InputStream? {
+        return withContext(Dispatchers.IO) {
+            return@withContext try {
+                val conn = URL(url).openConnection() as HttpURLConnection
+                for (header in getHeaders()) conn.addRequestProperty(header.key, header.value)
+                conn.requestMethod = "GET"
+                val input = conn.inputStream
+                input
+            } catch (e: Exception) {
+                e.printStackTrace()
+                null
+            }
+        }
+    }
+
+    fun getHeaders(): Map<String, String> {
+        return mapOf(Pair("User-Agent", "Mozilla/5.00"))
+    }
 }

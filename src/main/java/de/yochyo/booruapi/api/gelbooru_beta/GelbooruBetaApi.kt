@@ -14,7 +14,10 @@ import de.yochyo.json.XML
 import java.text.SimpleDateFormat
 import java.util.*
 
-open class GelbooruBetaApi(override val host: String, private val autoCompletionMethod: ITagAutoCompletion<GelbooruBetaApi, GelbooruBetaTag> = GelbooruBetaAutoCompletionMethods.WITH_PHP_SCRIPT) : IBooruApi {
+open class GelbooruBetaApi(
+    override val host: String,
+    private val autoCompletionMethod: ITagAutoCompletion<GelbooruBetaApi, GelbooruBetaTag> = GelbooruBetaAutoCompletionMethods.WITH_PHP_SCRIPT
+) : IBooruApi {
     private val mapper = JsonMapper.builder().apply {
         addModule(KotlinModule())
         defaultDateFormat(SimpleDateFormat("EEE MMM d HH:mm:ss Z yyyy", Locale.UK))
@@ -39,15 +42,18 @@ open class GelbooruBetaApi(override val host: String, private val autoCompletion
         val url = "$host/index.php?page=dapi&s=tag&q=index&json=1&api_key=$password&user_id=$username&limit=1&name=${encodeUTF8(name)}"
 
         val json =
-                if (name == "*") JSONArray()
-                else {
-                    val xml = BooruUtils.getStringFromUrl(url) ?: return null
-                    xml.let { XML.toJSONObject(it) }?.getJSONObject("tags")?.let { if (it.has("tag")) it.get("tag") else JSONArray() }.let {
-                        if (it is JSONObject) JSONArray().apply { put(it) }
-                        else if (it is JSONArray) it
-                        else null
+            if (name == "*") JSONArray()
+            else {
+                val xml = BooruUtils.getStringFromUrl(url) ?: return null
+                xml.let { XML.toJSONObject(it) }?.let { if (it.has("tags")) it.getJSONObject("tags") else null }
+                    ?.let { if (it.has("tag")) it.get("tag") else JSONArray() }.let {
+                        when (it) {
+                            is JSONObject -> JSONArray().apply { put(it) }
+                            is JSONArray -> it
+                            else -> null
+                        }
                     }
-                }
+            }
 
         return when {
             json == null -> null
@@ -71,10 +77,10 @@ open class GelbooruBetaApi(override val host: String, private val autoCompletion
         val url = "$host/index.php?page=dapi&s=post&q=index&api_key=$password&user_id=$username&limit=$limit&pid=$pid&tags=${encodeUTF8(tags)}"
         val xml = BooruUtils.getStringFromUrl(url) ?: return null
         val jsonParent = XML.toJSONObject(xml)
-        val json = jsonParent.getJSONObject("posts").let { if (it.has("post")) it.get("post") else JSONArray() }
-        return when {
-            json is JSONObject -> listOf(parsePostFromJson(json)).mapNotNull { it }
-            json is JSONArray -> json.mapNotNull { if (it is JSONObject) parsePostFromJson(it) else null }
+        val json = jsonParent.let { if (it.has("posts")) it.getJSONObject("posts") else null }?.let { if (it.has("post")) it.get("post") else JSONArray() }
+        return when (json) {
+            is JSONObject -> listOf(parsePostFromJson(json)).mapNotNull { it }
+            is JSONArray -> json.mapNotNull { if (it is JSONObject) parsePostFromJson(it) else null }
             else -> null
         }
     }

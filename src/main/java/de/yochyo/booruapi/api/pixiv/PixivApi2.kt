@@ -16,7 +16,7 @@ import kotlin.collections.HashMap
 
 class PixivApi2 : IBooruApi {
     override val host: String = "https://pixiv.net/"
-    private var refreshToken: String? = null
+    var refreshToken: String? = null
 
     val api = PixivApi().apply { setLanguage("en-us") }
 

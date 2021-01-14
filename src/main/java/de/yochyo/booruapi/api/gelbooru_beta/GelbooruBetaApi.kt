@@ -38,13 +38,13 @@ open class GelbooruBetaApi(
         return autoCompletionMethod.getTagAutoCompletion(this, begin, limit)
     }
 
-    override suspend fun getTag(name: String): GelbooruBetaTag? {
+    override suspend fun getTag(name: String): GelbooruBetaTag {
         val url = "$host/index.php?page=dapi&s=tag&q=index&json=1&api_key=$password&user_id=$username&limit=1&name=${encodeUTF8(name)}"
 
         val json =
             if (name == "*") JSONArray()
             else {
-                val xml = BooruUtils.getStringFromUrl(url) ?: return null
+                val xml = BooruUtils.getStringFromUrl(url) ?: return getDefaultTag(name)
                 xml.let { XML.toJSONObject(it) }?.let { if (it.has("tags")) it.getJSONObject("tags") else null }
                     ?.let { if (it.has("tag")) it.get("tag") else JSONArray() }.let {
                         when (it) {
@@ -56,8 +56,7 @@ open class GelbooruBetaApi(
             }
 
         return when {
-            json == null -> null
-            json.isEmpty -> getDefaultTag(name)
+            json == null || json.isEmpty -> getDefaultTag(name)
             else -> {
                 val tag = parseTagFromJson(json.getJSONObject(0))
                 if (tag?.name == name) tag
@@ -66,10 +65,9 @@ open class GelbooruBetaApi(
         }
     }
 
-    private suspend fun getDefaultTag(name: String): GelbooruBetaTag? {
-        val newestID = getNewestPost()?.id
-        return if (newestID != null) GelbooruBetaTag(-1, name, GelbooruBetaTag.GELBOORU_BETA_UNKNOWN, newestID, false)
-        else null
+    private suspend fun getDefaultTag(name: String): GelbooruBetaTag {
+        val newestID = getNewestPost()?.id ?: 0
+        return GelbooruBetaTag(-1, name, GelbooruBetaTag.GELBOORU_BETA_UNKNOWN, newestID, false)
     }
 
     override suspend fun getPosts(page: Int, tags: String, limit: Int): List<GelbooruBetaPost>? {

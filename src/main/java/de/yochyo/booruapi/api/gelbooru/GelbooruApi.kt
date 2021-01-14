@@ -35,14 +35,13 @@ open class GelbooruApi(override val host: String) : IBooruApi {
         return json?.mapNotNull { if (it is JSONObject) parseTagFromJson(it) else null }
     }
 
-    override suspend fun getTag(name: String): GelbooruTag? {
+    override suspend fun getTag(name: String): GelbooruTag {
         val url = "$host/index.php?page=dapi&s=tag&q=index&json=1&api_key=$password&user_id=$username&limit=1&name=${encodeUTF8(name)}"
         val json =
-                if (name == "*") JSONArray()
-                else BooruUtils.getJsonArrayFromUrl(url)
+            if (name == "*") JSONArray()
+            else BooruUtils.getJsonArrayFromUrl(url)
         return when {
-            json == null -> null
-            json.isEmpty -> getDefaultTag(name)
+            json == null || json.isEmpty -> getDefaultTag(name)
             else -> {
                 val tag = parseTagFromJson(json.getJSONObject(0))
                 if (tag?.name == name) tag
@@ -51,10 +50,9 @@ open class GelbooruApi(override val host: String) : IBooruApi {
         }
     }
 
-    private suspend fun getDefaultTag(name: String): GelbooruTag? {
-        val newestID = getNewestPost()?.id
-        return if (newestID != null) GelbooruTag(-1, name, GelbooruTag.GELBOORU_UNKNOWN, newestID, false)
-        else null
+    private suspend fun getDefaultTag(name: String): GelbooruTag {
+        val newestID = getNewestPost()?.id ?: 0
+        return GelbooruTag(-1, name, GelbooruTag.GELBOORU_UNKNOWN, newestID, false)
     }
 
     override suspend fun getPosts(page: Int, tags: String, limit: Int): List<GelbooruPost>? {

@@ -43,11 +43,10 @@ open class MyImoutoApi(override val host: String) : IBooruApi {
         return json?.mapNotNull { if (it is JSONObject) parsePostFromJson(it) else null }
     }
 
-    override suspend fun getTag(name: String): MyImoutoTag? {
+    override suspend fun getTag(name: String): MyImoutoTag {
         val json = if (name == "*") JSONArray() else BooruUtils.getJsonArrayFromUrl("${host}tag.json?name=${encodeUTF8(name)}*")
         return when {
-            json == null -> null
-            json.isEmpty -> getDefaultTag(name)
+            json == null || json.isEmpty -> getDefaultTag(name)
             else -> {
                 val tag = parseTagFromJson(json.getJSONObject(0))
                 if (tag?.name == name) tag
@@ -56,10 +55,9 @@ open class MyImoutoApi(override val host: String) : IBooruApi {
         }
     }
 
-    private suspend fun getDefaultTag(name: String): MyImoutoTag? {
-        val newestID = getNewestPost()?.id
-        return if (newestID != null) MyImoutoTag(-1, name, MyImoutoTag.MY_IMOUTO_UNKNOWN, newestID, "", Date(), false)
-        else null
+    private suspend fun getDefaultTag(name: String): MyImoutoTag {
+        val newestID = getNewestPost()?.id ?: 0
+        return MyImoutoTag(-1, name, MyImoutoTag.MY_IMOUTO_UNKNOWN, newestID, "", Date(), false)
     }
 
     protected fun passwordToHash(password: String): String {

@@ -10,48 +10,28 @@ PRIOTITIES:
 4: 'AND'
  */
 object ManagerBuilder {
-    fun toManager(api: IBooruApi, tagString: String, limit: Int): IManager {
-        val result: IManager
-        val splitByOr = tagString.split(" OR ")
-        val managers = ArrayList<IManager>()
-        for (s in splitByOr) managers += createExcludingManager(api, s, limit)
-        result = if (managers.size == 1) managers.first()
-        else ManagerFolder(managers, limit)
-        return BufferedManager(result)
-    }
-
-    private fun createExcludingManager(api: IBooruApi, s: String, limit: Int): IManager {
-        fun extractNotStatements(s: String): Pair<Collection<String>, String> { //NotStatements, StatementWithoutNots
-            val split = s.split(" ")
-            val withoutNots = ArrayList<String>()
-            val nots = ArrayList<String>()
-
-            var isInNotStatement = false
-            for (i in split.indices) {
-                val str = split[i]
-                if (!isInNotStatement) {
-                    if (str.startsWith("NOT(")) isInNotStatement = true
-                    else withoutNots += str
-                } else {
-                    if (str == ")") isInNotStatement = false
-                    else nots += str
+    fun createManager(api: IBooruApi, tagString: String, limit: Int): IManager {
+        return BufferedManager(
+            when {
+                tagString.contains(" OR ") -> BufferedManager(ManagerOR(tagString.split(" OR ").map { createManager(api, it, limit) }, limit))
+                tagString.contains("NOT\\(((?!\\)[ \$]).)*\\)".toRegex()) -> "NOT\\(((?!\\)[ \$]).)*\\)".toRegex().let { regex ->
+                    BufferedManager(ManagerNOT(
+                        createManager(api, regex.replace(tagString, "").split(" ").filter { it != "" }.joinToString(" ") { it }, limit),
+                        regex.findAll(tagString).toList().map { it.value }.map { it.substring(4, it.length - 1).filter { char -> char != ' ' } })
+                    )
                 }
+                /*
+                tagString.contains(" AND ") -> BufferedManager(
+                    ManagerAND(
+                        createManager(api, tagString.split(" AND ").first(), limit),
+                        tagString.substringAfter(" AND ").split(" AND "), limit
+                    )
+                )
+                 */
+                else -> Manager(api, tagString, limit)
             }
-            return Pair(nots, withoutNots.joinToString(" ") { it })
-        }
-
-        val result = extractNotStatements(s)
-        val childManager = createManager(api, result.second, limit)
-        return if (result.first.isEmpty()) childManager
-        else ManagerExcluding(childManager, result.first)
+        )
     }
 
-
-    private fun createManager(api: IBooruApi, tags: String, limit: Int): IManager {
-        val splitByAnd = tags.split(" AND ")
-        return if (splitByAnd.size == 1) Manager(api, tags, limit)
-        else ManagerBypassApi(api, splitByAnd.joinToString(" ") { it }.split(" "), limit)
-    }
-
-    fun toManagerFolder(managers: Collection<IManager>, limit: Int) = ManagerFolder(managers, limit)
+    fun toManagerOR(managers: Collection<IManager>, limit: Int) = ManagerOR(managers, limit)
 }

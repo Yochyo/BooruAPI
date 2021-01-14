@@ -7,6 +7,7 @@ import kotlinx.coroutines.sync.withLock
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.math.max
+import kotlin.math.min
 
 class BufferedManager(private val manager: IManager) : IManager by manager {
     override val posts: EventCollection<Post> = EventCollection(ArrayList())
@@ -14,21 +15,28 @@ class BufferedManager(private val manager: IManager) : IManager by manager {
     private val bufferedPosts = LinkedList<Post>()
     private val mutex = Mutex()
 
-    private var lastDownloadsForFullPage = 1
+    private var totalAmountOfPages = 0
     override suspend fun downloadNextPages(amount: Int): List<Post>? {
         return mutex.withLock {
-            var curDownloadsForFullPage = 0
             while (bufferedPosts.size < limit * amount) {
-                val page = manager.downloadNextPages(lastDownloadsForFullPage * amount)
-                if (page == null) return@withLock null
-                else if (page.isEmpty()) break
-                ManagerUtils.addAndRemoveDuplicates(bufferedPosts, page)
-                curDownloadsForFullPage++
+                val guessedPageAmount = guessPagesForSinglePageDownload() * amount
+                val page = manager.downloadNextPages(guessedPageAmount) ?: return@withLock null
+                if (page.isEmpty()) break
+
+                totalAmountOfPages += guessedPageAmount
+                bufferedPosts += page
             }
-            lastDownloadsForFullPage = max(1, curDownloadsForFullPage)
-            val result = take(limit*amount)
-            return ManagerUtils.addAndRemoveDuplicates(posts, result)
+
+            val result = take(limit * amount)
+            posts += result
+
+            result
         }
+    }
+
+    private fun guessPagesForSinglePageDownload(): Int {
+        if (posts.size <= 0) return 1
+        return max(1, min(totalAmountOfPages * limit / posts.size, 5))
     }
 
     override suspend fun downloadNextPage(): List<Post>? {
@@ -37,10 +45,7 @@ class BufferedManager(private val manager: IManager) : IManager by manager {
 
     private fun take(n: Int): List<Post> {
         val result = LinkedList<Post>()
-        try {
-            for (i in 0 until n) result += bufferedPosts.removeFirst()
-        } catch (e: java.lang.Exception) {
-        }
+        for (i in 0 until min(n, bufferedPosts.size)) result += bufferedPosts.removeFirst()
         return result
     }
 

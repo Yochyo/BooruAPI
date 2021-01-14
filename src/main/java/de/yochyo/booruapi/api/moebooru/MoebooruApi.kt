@@ -38,11 +38,10 @@ open class MoebooruApi(override val host: String) : IBooruApi {
         return json?.mapNotNull { if (it is JSONObject) parsePostFromJson(it) else null }
     }
 
-    override suspend fun getTag(name: String): MoebooruTag? {
+    override suspend fun getTag(name: String): MoebooruTag {
         val json = if (name == "*") JSONArray() else BooruUtils.getJsonArrayFromUrl("${host}tag.json?name=${encodeUTF8(name)}*")
         return when {
-            json == null -> null
-            json.isEmpty -> getDefaultTag(name)
+            json == null || json.isEmpty -> getDefaultTag(name)
             else -> {
                 val tag = parseTagFromJson(json.getJSONObject(0))
                 if (tag?.name == name) tag
@@ -51,10 +50,9 @@ open class MoebooruApi(override val host: String) : IBooruApi {
         }
     }
 
-    private suspend fun getDefaultTag(name: String): MoebooruTag? {
-        val newestID = getNewestPost()?.id
-        return if (newestID != null) MoebooruTag(-1, name, MoebooruTag.MOEBOORU_UNKNOWN, newestID, false)
-        else null
+    private suspend fun getDefaultTag(name: String): MoebooruTag {
+        val newestID = getNewestPost()?.id ?: 0
+        return MoebooruTag(-1, name, MoebooruTag.MOEBOORU_UNKNOWN, newestID, false)
     }
 
     protected fun passwordToHash(password: String): String {

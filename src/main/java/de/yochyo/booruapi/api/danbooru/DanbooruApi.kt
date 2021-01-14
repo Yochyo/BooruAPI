@@ -24,14 +24,13 @@ class DanbooruApi(override val host: String) : IBooruApi {
     protected var username = ""
     protected var apiKey = ""
 
-    override suspend fun getTag(name: String): DanbooruTag? {
+    override suspend fun getTag(name: String): DanbooruTag {
         val json =
-                if (name == "*") JSONArray()
-                else BooruUtils.getJsonArrayFromUrl("${host}tags.json?search[name_matches]=${encodeUTF8(name)}")
+            if (name == "*") JSONArray()
+            else BooruUtils.getJsonArrayFromUrl("${host}tags.json?search[name_matches]=${encodeUTF8(name)}")
 
         return when {
-            json == null -> null
-            json.isEmpty -> getDefaultTag(name)
+            json == null || json.isEmpty -> getDefaultTag(name)
             else -> {
                 val tag = parseTagFromJson(json.getJSONObject(0))
                 if (tag?.name == name) tag
@@ -40,10 +39,9 @@ class DanbooruApi(override val host: String) : IBooruApi {
         }
     }
 
-    private suspend fun getDefaultTag(name: String): DanbooruTag? {
-        val newestCount = getNewestPost()?.id
-        return if (newestCount == null) null
-        else DanbooruTag(-1, name, DanbooruTag.DANBOORU_UNKNOWN, newestCount, Date(), Date(), false)
+    private suspend fun getDefaultTag(name: String): DanbooruTag {
+        val newestCount = getNewestPost()?.id ?: 0
+        return DanbooruTag(-1, name, DanbooruTag.DANBOORU_UNKNOWN, newestCount, Date(), Date(), false)
 
     }
 

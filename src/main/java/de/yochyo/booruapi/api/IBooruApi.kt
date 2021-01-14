@@ -24,7 +24,7 @@ interface IBooruApi {
      * @return The tag with the name "name".
      * If the tag does not exist, All fields will have default values (type = TagType.UNKNOWN, count = ID of newest Post)
      */
-    suspend fun getTag(name: String): Tag?
+    suspend fun getTag(name: String): Tag
 
     /**
      * Returns a List of size "limit" or less with Tags starting with "begin"
@@ -59,6 +59,6 @@ interface IBooruApi {
     }
 
     fun getHeaders(): Map<String, String> {
-        return mapOf(Pair("User-Agent", "Mozilla/5.00"))
+        return mapOf(Pair("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:84.0) Gecko/20100101 Firefox/84.0"))
     }
 }

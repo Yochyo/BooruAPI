@@ -23,13 +23,6 @@ class ManagerOR(val managers: Collection<IManager>, override val limit: Int) : I
         var defaultSortingAlgerithm: IManagerORSortingAlgorithm = ManagerORDefaultSortingAlgorithm()
     }
 
-    /**
-     * @return empty on end or null on error
-     */
-    override suspend fun downloadNextPage(): List<Post>? {
-        return downloadNextPages(1)
-    }
-
     override suspend fun downloadNextPages(amount: Int): List<Post>? {
         return mutex.withLock {
             while (cachedPosts.size < limit * amount) {

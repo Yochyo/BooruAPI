@@ -20,17 +20,22 @@ object ManagerBuilder {
                         regex.findAll(tagString).toList().map { it.value }.map { it.substring(4, it.length - 1).filter { char -> char != ' ' } })
                     )
                 }
-                /*
-                tagString.contains(" AND ") -> BufferedManager(
-                    ManagerAND(
-                        createManager(api, tagString.split(" AND ").first(), limit),
-                        tagString.substringAfter(" AND ").split(" AND "), limit
+                tagString.contains("id:>") -> {
+                    val find = tagString.split(" ").find { it.contains("id:>") } ?: ""
+                    BufferedManager(
+                        ManagerWithIdLimit(
+                            createManager(api, tagString.removeSequence(find), limit),
+                            find.removeSequence("id:>").toIntOrNull() ?: 0
+                        )
                     )
-                )
-                 */
+                }
                 else -> Manager(api, tagString, limit)
             }
         )
+    }
+
+    private fun String.removeSequence(sequence: String): String {
+        return this.replace(sequence, "").split(" ").filter { it != "" }.joinToString(" ") { it }
     }
 
     fun toManagerOR(managers: Collection<IManager>, limit: Int) = ManagerOR(managers, limit)

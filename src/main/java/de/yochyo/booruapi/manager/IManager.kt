@@ -10,7 +10,7 @@ interface IManager {
     /**
      * @return returns null on error or end, returns null if the download succeeded but the result list would be empty
      */
-    suspend fun downloadNextPage(): List<Post>?
+    suspend fun downloadNextPage(): List<Post>? = downloadNextPages(1)
     suspend fun downloadNextPages(amount: Int): List<Post>?
     suspend fun clear()
 }

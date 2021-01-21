@@ -22,15 +22,9 @@ class Manager(val api: IBooruApi, val tags: String, override val limit: Int) : I
     var currentPage = 1
         private set
 
-    /**
-     * @return empty list on end null on error
-     */
-    override suspend fun downloadNextPage(): List<Post>? {
-        return downloadNextPages(1)
-    }
-
     override suspend fun downloadNextPages(amount: Int): List<Post>? {
         return mutex.withLock {
+            val time = System.currentTimeMillis()
             val pages = (currentPage until currentPage + amount).map {
                 GlobalScope.async { api.getPosts(it, tags, limit) }
             }.awaitAll()
@@ -44,6 +38,7 @@ class Manager(val api: IBooruApi, val tags: String, override val limit: Int) : I
             val allPagesAsList = LinkedList<Post>().apply { pagesUntilError.forEach { this += it } }
             val resultWithoutDuplicates = removeDuplicatesUpdateCachedList(cachedPostIds, allPagesAsList)
             posts += resultWithoutDuplicates
+            println("Manager: ${System.currentTimeMillis() - time}ms, $tags, $amount page(s), limit $limit, ${api.host}")
             resultWithoutDuplicates
         }
     }

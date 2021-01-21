@@ -25,10 +25,6 @@ class ManagerNOT(private val manager: IManager, private val excluding: Collectio
         }
     }
 
-    override suspend fun downloadNextPage(): List<Post>? {
-        return downloadNextPages(1)
-    }
-
     override suspend fun clear() {
         mutex.withLock {
             posts.clear()

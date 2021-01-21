@@ -2,6 +2,9 @@ package de.yochyo.booruapi.utils
 
 import de.yochyo.booruapi.api.Post
 import java.net.URLEncoder
+import java.util.logging.Logger
+
+val logger = Logger.getLogger("de.yochyo.BooruApi")
 
 fun encodeUTF8(urlStr: String): String {
     return URLEncoder.encode(urlStr, "UTF-8")

@@ -46,7 +46,6 @@ data class DanbooruPost(
         val parentId: Int?,
         val hasChildren: Boolean,
 
-
         val lastNotedAt: Date?,
         val isRatingLocked: Boolean,
         val approverId: Int?,

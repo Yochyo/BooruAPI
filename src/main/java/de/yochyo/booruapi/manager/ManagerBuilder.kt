@@ -1,14 +1,24 @@
 package de.yochyo.booruapi.manager
 
 import de.yochyo.booruapi.api.IBooruApi
+import java.util.*
 
-/*
-PRIOTITIES:
-1: ' '
-2: 'OR'
-3: 'NOT'
-4: 'AND'
- */
+class ManagerFactoryChainElement<E : IManager>(val clazz: Class<E>, val factory: (api: IBooruApi, tagString: String, limit: Int) -> IManager?) {
+    val className = clazz.name
+    override fun equals(other: Any?): Boolean {
+        if (other is ManagerFactoryChainElement<*>)
+            return className == other.className
+        return false
+    }
+
+    override fun hashCode(): Int {
+        var result = clazz.hashCode()
+        result = 31 * result + factory.hashCode()
+        result = 31 * result + (className.hashCode() ?: 0)
+        return result
+    }
+}
+
 object ManagerBuilder {
     fun createManager(api: IBooruApi, tagString: String, limit: Int): IManager {
         return BufferedManager(

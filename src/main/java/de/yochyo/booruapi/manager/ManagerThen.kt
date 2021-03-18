@@ -40,4 +40,8 @@ class ManagerThen(val managers: List<IManager>) : IManager {
             managers.forEach { it.clear() }
         }
     }
+
+    override fun toString(): String {
+        return managers.joinToString(" THEN ") { it.toString() }
+    }
 }

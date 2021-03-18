@@ -27,9 +27,9 @@ class ManagerOR(val managers: Collection<IManager>, override val limit: Int) : I
         return mutex.withLock {
             while (cachedPosts.size < limit * amount) {
                 val pages = managers.map { it.downloadNextPages(amount) }
-                pages.forEach { if (it == null) return@withLock null }
-
                 val pagesNotNull = pages.mapNotNull { it }
+                if (pagesNotNull.isEmpty()) return@withLock null
+
                 if (pagesNotNull.isEmpty() || pagesNotNull.flatten().isEmpty()) break
                 cachedPosts += getSortingAlgorithm().mergePages(pagesNotNull)
             }

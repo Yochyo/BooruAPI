@@ -47,6 +47,15 @@ object ManagerBuilder {
     }
 
     init {
+        chain += ManagerFactoryChainElement(ManagerEach::class.java) { api: IBooruApi, tagString: String, limit: Int ->
+            if (tagString.contains("EACH\\(((?!\\)[ \$]).)*\\)".toRegex())) {
+                val foreach = "EACH\\(((?!\\)[ \$]).)*\\)".toRegex().findAll(tagString).toList().map { it.value }
+                    .map { it.substring(5, it.length - 1) }.map { it.split(" ") }.flatten().joinToString(" ") { it }.removeMultipleSpaces()
+                var tagString = "$foreach " + "EACH\\(((?!\\)[ \$]).)*\\)".toRegex().replace(tagString, "").removeMultipleSpaces()
+                ManagerEach.delimiters.forEach { tagString = tagString.replace(it, "$it $foreach") }
+                createManagerNonBuffered(api, tagString, limit)
+            } else null
+        }
         chain += ManagerFactoryChainElement(ManagerThen::class.java) { api: IBooruApi, tagString: String, limit: Int ->
             if (tagString.contains(" THEN ")) ManagerThen(tagString.split(" THEN ").map { createManagerNonBuffered(api, it, limit) })
             else null
@@ -67,7 +76,7 @@ object ManagerBuilder {
         chain += ManagerFactoryChainElement(ManagerNOT::class.java) { api: IBooruApi, tagString: String, limit: Int ->
             if (tagString.contains("NOT\\(((?!\\)[ \$]).)*\\)".toRegex())) "NOT\\(((?!\\)[ \$]).)*\\)".toRegex().let { regex ->
                 ManagerNOT(
-                    createManagerNonBuffered(api, regex.replace(tagString, "").split(" ").filter { it != "" }.joinToString(" ") { it }, limit),
+                    createManagerNonBuffered(api, regex.replace(tagString, "").removeMultipleSpaces(), limit),
                     regex.findAll(tagString).toList().map { it.value }.map { it.substring(4, it.length - 1).filter { char -> char != ' ' } })
             }
             else null
@@ -90,6 +99,10 @@ object ManagerBuilder {
     fun toManagerOR(managers: Collection<IManager>, limit: Int) = ManagerOR(managers, limit)
 
     private fun String.removeFirstSequenceOfTag(sequence: String): String {
-        return this.replaceFirst(sequence, "").split(" ").filter { it != "" }.joinToString(" ") { it }
+        return this.replaceFirst(sequence, "").removeMultipleSpaces()
+    }
+
+    private fun String.removeMultipleSpaces(): String {
+        return split(" ").filter { it != "" }.joinToString(" ") { it }
     }
 }

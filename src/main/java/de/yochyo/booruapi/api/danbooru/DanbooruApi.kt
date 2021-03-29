@@ -16,7 +16,7 @@ import java.util.*
 class DanbooruApi(override val host: String) : IBooruApi {
     private val mapper = JsonMapper.builder().apply {
         addModule(KotlinModule())
-        defaultDateFormat(SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX", Locale.UK))
+        defaultDateFormat(SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS", Locale.UK))
         propertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE)
         configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
     }.build()

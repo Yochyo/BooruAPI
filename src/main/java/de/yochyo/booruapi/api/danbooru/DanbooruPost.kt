@@ -6,7 +6,6 @@ import de.yochyo.booruapi.api.Tag
 import de.yochyo.booruapi.api.danbooru.DanbooruTag
 import de.yochyo.booruapi.utils.extension
 import java.util.*
-import kotlin.collections.ArrayList
 
 //TODO comments
 data class DanbooruPost(
@@ -52,7 +51,7 @@ data class DanbooruPost(
         val uploaderId: Int,
         override val fileSize: Int,
         val isStatusLocked: Boolean,
-        val poolString: String,
+        val poolString: String?,
         val upScore: Int,
         val downScore: Int,
         val isPending: Boolean,

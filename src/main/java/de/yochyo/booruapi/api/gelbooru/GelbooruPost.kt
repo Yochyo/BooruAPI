@@ -11,29 +11,30 @@ import java.util.*
 
 //TODO comments
 data class GelbooruPost(
-        val source: String,
-        val directory: String,
-        val hash: String,
-        override val height: Int,
-        override val id: Int,
-        @JsonProperty("image") val imageName: String,
-        val change: Long,
-        val owner: String,
-        val parentId: Int,
-        override val rating: String,
-        val sample: Boolean,
-        val sampleHeight: Int,
-        val sampleWidth: Int,
-        val score: Int,
-        @JsonProperty("tags") override val tagString: String,
-        override val width: Int,
-        val fileUrl: String,
-        val createdAt: Date,
-        var gelbooruApi: GelbooruApi? = null,
+    val source: String,
+    val directory: String,
+    val md5: String,
+    override val height: Int,
+    override val id: Int,
+    @JsonProperty("image") val imageName: String,
+    val change: Long,
+    val owner: String,
+    val parentId: Int,
+    override val rating: String,
+    val sample: Boolean,
+    val sampleHeight: Int,
+    val sampleWidth: Int,
+    val score: Int,
+    @JsonProperty("tags") override val tagString: String,
+    override val width: Int,
+    val fileUrl: String,
+    val createdAt: Date,
+    var gelbooruApi: GelbooruApi? = null,
 ) : Post(
-        id, imageName.extension(), width, height, rating, -1, fileUrl,
-        if (sample) getSampleUrl(fileUrl, directory, hash) else fileUrl,
-        getPreviewUrl(fileUrl, directory, hash), tagString) {
+    id, imageName.extension(), width, height, rating, -1, fileUrl,
+    if (sample) getSampleUrl(fileUrl, directory, md5) else fileUrl,
+    getPreviewUrl(fileUrl, directory, md5), tagString
+) {
     private val _tags by lazy {
         if (gelbooruApi == null) super.getTags()
         else runBlocking { gelbooruApi!!.getTags(tagString) } ?: super.getTags()

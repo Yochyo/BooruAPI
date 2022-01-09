@@ -30,20 +30,27 @@ open class GelbooruApi(override val host: String) : IBooruApi {
     }
 
     override suspend fun getTagAutoCompletion(begin: String, limit: Int): List<GelbooruTag>? {
-        val url = "$host/index.php?page=dapi&s=tag&q=index&json=1&api_key=$password&user_id=$username&limit=$limit&name_pattern=${encodeUTF8(begin)}%"
+        val url = "$host/index.php?page=autocomplete2&term=${encodeUTF8(begin)}&type=tag_query&limit=$limit"
         val json = BooruUtils.getJsonArrayFromUrl(url)
-        return json?.mapNotNull { if (it is JSONObject) parseTagFromJson(it) else null }
+        return json?.mapNotNull {
+            if (it is JSONObject) parseTagFromJson<TempGelbooruTag>(it)?.let {
+                GelbooruTag(0, it.value, TempGelbooruTag.typeStringToEnum(it.typeString).value, it.post_count)
+            } else null
+        }
     }
 
     override suspend fun getTag(name: String): GelbooruTag {
         val url = "$host/index.php?page=dapi&s=tag&q=index&json=1&api_key=$password&user_id=$username&limit=1&name=${encodeUTF8(name)}"
-        val json =
-            if (name == "*") JSONArray()
-            else BooruUtils.getJsonArrayFromUrl(url)
+        var json = if (name == "*") JSONArray() else {
+            val obj = BooruUtils.getJsonObjectFromUrl(url)
+            println(obj)
+            if (obj?.has("tag") == true) obj.getJSONArray("tag")
+            else null
+        }
         return when {
             json == null || json.isEmpty -> getDefaultTag(name)
             else -> {
-                val tag = parseTagFromJson(json.getJSONObject(0))
+                val tag = parseTagFromJson<GelbooruTag>(json.getJSONObject(0))
                 if (tag?.name == name) tag
                 else getDefaultTag(name)
             }
@@ -58,13 +65,18 @@ open class GelbooruApi(override val host: String) : IBooruApi {
     override suspend fun getPosts(page: Int, tags: String, limit: Int): List<GelbooruPost>? {
         val pid = (page - 1)
         val url = "$host/index.php?page=dapi&s=post&q=index&json=1&api_key=$password&user_id=$username&limit=$limit&pid=$pid&tags=${encodeUTF8(tags)}"
-        val json = BooruUtils.getJsonArrayFromUrl(url)
+        val json = BooruUtils.getJsonObjectFromUrl(url)?.let { if (it.has("post")) it.getJSONArray("post") else JSONArray() }
         return json?.mapNotNull { if (it is JSONObject) parsePostFromJson(it) else null }
     }
 
     suspend fun getTags(names: String): List<GelbooruTag>? {
         val url = "$host/index.php?page=dapi&s=tag&q=index&json=1&api_key=$password&user_id=$username&limit=${names.split(" ").size}&names=${encodeUTF8(names)}"
-        val json = BooruUtils.getJsonArrayFromUrl(url)
+        var json = if (names == "*") JSONArray() else {
+            val obj = BooruUtils.getJsonObjectFromUrl(url)
+            println(obj)
+            if (obj?.has("tag") == true) obj.getJSONArray("tag")
+            else null
+        }
         return when {
             json == null -> null
             json.isEmpty -> emptyList()
@@ -82,10 +94,11 @@ open class GelbooruApi(override val host: String) : IBooruApi {
         null
     }
 
-    fun parseTagFromJson(json: JSONObject): GelbooruTag? = try {
-        mapper.readValue(json.toString(), GelbooruTag::class.java)
+    private inline fun <reified Tag> parseTagFromJson(json: JSONObject): Tag? = try {
+        mapper.readValue(json.toString(), Tag::class.java)
     } catch (e: Exception) {
         e.printStackTrace()
+        println(json)
         null
     }
 }

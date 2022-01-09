@@ -9,7 +9,7 @@
     <version>2.4.0</version>
 
     <properties>
-        <kotlin.version>1.4.10</kotlin.version>
+        <kotlin.version>1.5.31</kotlin.version>
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.compiler.source>1.8</maven.compiler.source>
     </properties>
@@ -50,7 +50,7 @@
         <dependency>
             <groupId>de.yochyo.eventcollection</groupId>
             <artifactId>EventCollection</artifactId>
-            <version>1.6.4</version>
+            <version>1.7.1</version>
         </dependency>
         <dependency>
             <groupId>de.yochyo.pixiv-api</groupId>
@@ -58,9 +58,9 @@
             <version>1.1.1</version>
         </dependency>
         <dependency>
-            <groupId>de.yochyo.json</groupId>
-            <artifactId>JSON</artifactId>
-            <version>1.0</version>
+            <groupId>de.yochyo.downloader</groupId>
+            <artifactId>Downloader</artifactId>
+            <version>1.8.0</version>
         </dependency>
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>

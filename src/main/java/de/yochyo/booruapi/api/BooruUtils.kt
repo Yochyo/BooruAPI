@@ -18,9 +18,13 @@ object BooruUtils {
      * @return JSONObject or null if error
      */
     suspend fun getJsonObjectFromUrl(urlToRead: String): JSONObject? {
+        var json: String? = null
         return try {
-            JSONObject(String(getUrlInputStream(urlToRead)!!.use { it.readBytes() }))
+            json = String(getUrlInputStream(urlToRead)!!.use { it.readBytes() })
+            JSONObject(json)
         } catch (e: Exception) {
+            e.printStackTrace()
+            println(json)
             null
         }
     }
@@ -31,9 +35,13 @@ object BooruUtils {
      * @return JSONArray or null if error
      */
     suspend fun getJsonArrayFromUrl(urlToRead: String): JSONArray? {
+        var json: String? = null
         return try {
-            JSONArray(String(getUrlInputStream(urlToRead)!!.use { it.readBytes() }))
+            json = String(getUrlInputStream(urlToRead)!!.use { it.readBytes() })
+            JSONArray(json)
         } catch (e: Exception) {
+            e.printStackTrace()
+            println(json)
             null
         }
     }

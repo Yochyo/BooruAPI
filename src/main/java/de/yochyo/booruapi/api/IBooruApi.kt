@@ -59,6 +59,6 @@ interface IBooruApi {
     }
 
     fun getHeaders(): Map<String, String> {
-        return mapOf(Pair("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:84.0) Gecko/20100101 Firefox/84.0"))
+        return mapOf(Pair("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36"))
     }
 }

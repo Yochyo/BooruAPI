@@ -52,7 +52,8 @@ class DanbooruApi(override val host: String) : IBooruApi {
     }
 
     override suspend fun getPosts(page: Int, tags: String, limit: Int): List<DanbooruPost>? {
-        val url = "${host}posts.json?limit=$limit&page=$page&login=$username&api_key=$apiKey&tags=${encodeUTF8(tags)}"
+        var url = "${host}posts.json?limit=$limit&page=$page&tags=${encodeUTF8(tags)}"
+        if (username != "" && apiKey != "") url += "&login=$username&api_key=$apiKey"
         val json = BooruUtils.getJsonArrayFromUrl(url)
         return json?.mapNotNull { if (it is JSONObject) parsePostFromJson(it) else null }
     }

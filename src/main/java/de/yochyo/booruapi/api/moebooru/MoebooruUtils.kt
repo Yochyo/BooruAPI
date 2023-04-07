@@ -20,7 +20,7 @@ object MoebooruUtils {
         }
 
         override fun getName(element: Element): String {
-            val elements = element.select("a").filter { it.text() != "?" }
+            val elements = element.select("a").filter { it -> it.text() != "?" }
             return elements.firstOrNull()?.text() ?: "null"
         }
 

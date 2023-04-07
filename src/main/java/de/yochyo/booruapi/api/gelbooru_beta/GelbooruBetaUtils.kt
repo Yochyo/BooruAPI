@@ -18,7 +18,8 @@ object GelbooruBetaUtils {
         }
 
         override fun getName(element: Element): String {
-            return element.select("a").firstOrNull()?.text() ?: ""
+            val elements = element.select("a").filter { it -> it.text() != "?" }
+            return elements.firstOrNull()?.text() ?: "null"
         }
 
         override fun toTag(name: String, type: Int): GelbooruBetaTag {

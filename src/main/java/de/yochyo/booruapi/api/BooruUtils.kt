@@ -66,14 +66,16 @@ object BooruUtils {
      */
     suspend fun getUrlInputStream(url: String): InputStream? {
         return withContext(Dispatchers.IO) {
+            var conn: Any? = null
             return@withContext try {
-                val conn = URL(url).openConnection() as HttpURLConnection
+                conn = URL(url).openConnection() as HttpURLConnection
                 conn.addRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:84.0) Gecko/20100101 Firefox/84.0")
                 conn.requestMethod = "GET"
                 val input = conn.inputStream
                 input
             } catch (e: Exception) {
                 e.printStackTrace()
+                println(conn)
                 null
             }
         }

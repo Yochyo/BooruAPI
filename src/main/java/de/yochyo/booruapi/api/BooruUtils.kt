@@ -11,7 +11,15 @@ import java.net.HttpURLConnection
 import java.net.URL
 import java.util.*
 
-object BooruUtils {
+class BooruUtils(
+    var headers: Map<String, String> =
+        mapOf(Pair("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36"))
+) {
+
+    companion object {
+        val INSTANCE = BooruUtils()
+    }
+
     /**
      * Returns a JSONObject parsed from an url
      * @param urlToRead url to read to Object from
@@ -66,16 +74,14 @@ object BooruUtils {
      */
     suspend fun getUrlInputStream(url: String): InputStream? {
         return withContext(Dispatchers.IO) {
-            var conn: Any? = null
             return@withContext try {
-                conn = URL(url).openConnection() as HttpURLConnection
-                conn.addRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:84.0) Gecko/20100101 Firefox/84.0")
+                val conn = URL(url).openConnection() as HttpURLConnection
+                for (header in headers) conn.addRequestProperty(header.key, header.value)
                 conn.requestMethod = "GET"
                 val input = conn.inputStream
                 input
             } catch (e: Exception) {
                 e.printStackTrace()
-                println(conn)
                 null
             }
         }

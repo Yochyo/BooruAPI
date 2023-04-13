@@ -11,7 +11,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import java.util.*
-import kotlin.collections.HashMap
 
 
 class PixivApi2 : IBooruApi {
@@ -159,10 +158,7 @@ class PixivApi2 : IBooruApi {
     private fun pixivTagToTag(tag: de.yochyo.pixiv_api.response_types.PixivTag): PixivTag? {
         val name = tag.translatedName ?: tag.name ?: return null
 //        TODO()//tagtype
-        return PixivTag(name, TagType.GENERAL, -1)
-    }
 
-    override fun getHeaders(): Map<String, String> {
-        return api.additionalHeaders
+        return PixivTag(name, TagType.GENERAL, -1)
     }
 }

@@ -32,19 +32,19 @@ open class MyImoutoApi(override val host: String) : IBooruApi {
 
 
     override suspend fun getTagAutoCompletion(begin: String, limit: Int): List<MyImoutoTag>? {
-        val json = BooruUtils.getJsonArrayFromUrl("${host}tag.json?name=${encodeUTF8(begin)}*&limit=$limit&search[order]=count")
+        val json = BooruUtils.INSTANCE.getJsonArrayFromUrl("${host}tag.json?name=${encodeUTF8(begin)}*&limit=$limit&search[order]=count")
         return json?.mapNotNull { if (it is JSONObject) parseTagFromJson(it) else null }
     }
 
     override suspend fun getPosts(page: Int, tags: String, limit: Int): List<MyImoutoPost>? {
         val tags = if (tags == "*") "" else tags
         val url = "${host}post.json?limit=$limit&page=$page&login=$username&password_hash=$password&tags=${encodeUTF8(tags)}"
-        val json = BooruUtils.getJsonArrayFromUrl(url)
+        val json = BooruUtils.INSTANCE.getJsonArrayFromUrl(url)
         return json?.mapNotNull { if (it is JSONObject) parsePostFromJson(it) else null }
     }
 
     override suspend fun getTag(name: String): MyImoutoTag {
-        val json = if (name == "*") JSONArray() else BooruUtils.getJsonArrayFromUrl("${host}tag.json?name=${encodeUTF8(name)}*")
+        val json = if (name == "*") JSONArray() else BooruUtils.INSTANCE.getJsonArrayFromUrl("${host}tag.json?name=${encodeUTF8(name)}*")
         return when {
             json == null || json.isEmpty -> getDefaultTag(name)
             else -> {

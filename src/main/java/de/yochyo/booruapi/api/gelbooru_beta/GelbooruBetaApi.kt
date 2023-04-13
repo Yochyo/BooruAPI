@@ -44,7 +44,7 @@ open class GelbooruBetaApi(
         val json =
             if (name == "*") JSONArray()
             else {
-                val xml = BooruUtils.getStringFromUrl(url) ?: return getDefaultTag(name)
+                val xml = BooruUtils.INSTANCE.getStringFromUrl(url) ?: return getDefaultTag(name)
                 xml.let { XML.toJSONObject(it) }?.let { if (it.has("tags")) it.getJSONObject("tags") else null }
                     ?.let { if (it.has("tag")) it.get("tag") else JSONArray() }.let {
                         when (it) {
@@ -73,7 +73,7 @@ open class GelbooruBetaApi(
     override suspend fun getPosts(page: Int, tags: String, limit: Int): List<GelbooruBetaPost>? {
         val pid = (page - 1)
         val url = "$host/index.php?page=dapi&s=post&q=index&api_key=$password&user_id=$username&limit=$limit&pid=$pid&tags=${encodeUTF8(tags)}"
-        val xml = BooruUtils.getStringFromUrl(url) ?: return null
+        val xml = BooruUtils.INSTANCE.getStringFromUrl(url) ?: return null
         val jsonParent = XML.toJSONObject(xml)
         val json = jsonParent.let { if (it.has("posts")) it.getJSONObject("posts") else null }?.let { if (it.has("post")) it.get("post") else JSONArray() }
         return when (json) {

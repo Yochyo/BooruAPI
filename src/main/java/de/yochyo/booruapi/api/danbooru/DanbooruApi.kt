@@ -23,11 +23,12 @@ class DanbooruApi(override val host: String) : IBooruApi {
 
     protected var username = ""
     protected var apiKey = ""
+    private val utils = BooruUtils(mapOf(Pair("User-Agent", "Yummybooru user $username")))
 
     override suspend fun getTag(name: String): DanbooruTag {
         val json =
             if (name == "*") JSONArray()
-            else BooruUtils.getJsonArrayFromUrl("${host}tags.json?search[name_matches]=${encodeUTF8(name)}")
+            else utils.getJsonArrayFromUrl("${host}tags.json?search[name_matches]=${encodeUTF8(name)}")
 
         return when {
             json == null || json.isEmpty -> getDefaultTag(name)
@@ -47,14 +48,14 @@ class DanbooruApi(override val host: String) : IBooruApi {
 
     override suspend fun getTagAutoCompletion(begin: String, limit: Int): List<DanbooruTag>? {
         val url = "${host}tags.json?search[name_matches]=${encodeUTF8(begin)}*&limit=$limit&search[order]=count"
-        val json = BooruUtils.getJsonArrayFromUrl(url)
+        val json = utils.getJsonArrayFromUrl(url)
         return json?.mapNotNull { if (it is JSONObject) parseTagFromJson(it) else null }
     }
 
     override suspend fun getPosts(page: Int, tags: String, limit: Int): List<DanbooruPost>? {
         var url = "${host}posts.json?limit=$limit&page=$page&tags=${encodeUTF8(tags)}"
         if (username != "" && apiKey != "") url += "&login=$username&api_key=$apiKey"
-        val json = BooruUtils.getJsonArrayFromUrl(url)
+        val json = utils.getJsonArrayFromUrl(url)
         return json?.mapNotNull { if (it is JSONObject) parsePostFromJson(it) else null }
     }
 
@@ -75,6 +76,7 @@ class DanbooruApi(override val host: String) : IBooruApi {
     override suspend fun login(username: String, password: String): Boolean {
         this.username = username
         this.apiKey = password
+        this.utils.headers = mapOf(Pair("User-Agent", "Yummybooru user $username"))
         return true
     }
 

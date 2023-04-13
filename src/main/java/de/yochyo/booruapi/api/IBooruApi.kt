@@ -1,11 +1,5 @@
 package de.yochyo.booruapi.api
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import java.io.InputStream
-import java.net.HttpURLConnection
-import java.net.URL
-
 
 interface IBooruApi {
     val host: String
@@ -43,22 +37,4 @@ interface IBooruApi {
     suspend fun getPosts(page: Int, tags: String, limit: Int): List<Post>?
     suspend fun getNewestPost(): Post? = getPosts(1, "*", 1)?.firstOrNull()
 
-    suspend fun getUrlInputStream(url: String): InputStream? {
-        return withContext(Dispatchers.IO) {
-            return@withContext try {
-                val conn = URL(url).openConnection() as HttpURLConnection
-                for (header in getHeaders()) conn.addRequestProperty(header.key, header.value)
-                conn.requestMethod = "GET"
-                val input = conn.inputStream
-                input
-            } catch (e: Exception) {
-                e.printStackTrace()
-                null
-            }
-        }
-    }
-
-    fun getHeaders(): Map<String, String> {
-        return mapOf(Pair("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36"))
-    }
 }

@@ -11,7 +11,7 @@ object GelbooruBetaAutoCompletionMethods {
     val WITH_TAG_COLLECTION = object : ITagAutoCompletion<GelbooruBetaApi, GelbooruBetaTag> {
         override suspend fun getTagAutoCompletion(api: GelbooruBetaApi, begin: String, limit: Int): List<GelbooruBetaTag>? {
             val url = "${api.host}/index.php?page=dapi&s=tag&q=index&json=1&limit=$limit&name_pattern=${encodeUTF8(begin)}"
-            val xml = BooruUtils.getStringFromUrl(url) ?: return null
+            val xml = BooruUtils.INSTANCE.getStringFromUrl(url) ?: return null
             val jsonParent = XML.toJSONObject(xml)
             val json = jsonParent.getJSONObject("tags").let { if (it.has("tag")) it.get("tag") else JSONArray() }
             return when {
@@ -24,7 +24,7 @@ object GelbooruBetaAutoCompletionMethods {
     val WITH_PHP_SCRIPT = object : ITagAutoCompletion<GelbooruBetaApi, GelbooruBetaTag> {
         override suspend fun getTagAutoCompletion(api: GelbooruBetaApi, begin: String, limit: Int): List<GelbooruBetaTag>? {
             val url = "${api.host}/autocomplete.php?q=$begin"
-            val json = BooruUtils.getJsonArrayFromUrl(url) ?: return null
+            val json = BooruUtils.INSTANCE.getJsonArrayFromUrl(url) ?: return null
             return json.mapNotNull { if (it is JSONObject) getTag(it) else null }
         }
 
